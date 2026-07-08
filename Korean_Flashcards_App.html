@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Korean Flashcards · 156 cartes</title>
+<style>
+:root{
+  --bg:#F5F0E8;--card:#FFFFFF;--ink:#1A1D2B;--muted:#8C8578;
+  --accent:#C2453B;--accent2:#3C4A8C;--green:#2E7D5B;--green-soft:#E4F5EC;
+  --line:#E0D9CC;--shadow:0 4px 24px rgba(30,25,15,.08);
+  --r:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{height:100%}
+body{
+  min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;
+  display:flex;flex-direction:column;align-items:center;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+.kr{font-family:"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic","Nanum Gothic",sans-serif}
+
+/* ---- Top bar ---- */
+.topbar{
+  width:100%;max-width:580px;padding:18px 20px 0;display:flex;align-items:center;justify-content:space-between;
+}
+.logo{font-weight:800;font-size:1.05rem;color:var(--accent2);display:flex;align-items:center;gap:7px}
+.logo span{font-size:1.3rem}
+.topcount{font-size:.82rem;color:var(--muted);font-weight:600}
+
+/* ---- Filters ---- */
+.filters{
+  width:100%;max-width:580px;padding:14px 20px 6px;display:flex;gap:8px;flex-wrap:wrap;
+}
+.fbtn{
+  border:none;background:var(--card);color:var(--muted);font-size:.78rem;font-weight:600;
+  padding:7px 13px;border-radius:99px;cursor:pointer;border:1.5px solid var(--line);
+  transition:all .15s;font-family:inherit;
+}
+.fbtn:hover{border-color:var(--accent2);color:var(--accent2)}
+.fbtn.active{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+
+/* ---- Progress ---- */
+.progress-wrap{width:100%;max-width:580px;padding:12px 20px 4px;display:flex;align-items:center;gap:12px}
+.pbar{flex:1;height:6px;background:var(--line);border-radius:99px;overflow:hidden}
+.pfill{height:100%;background:var(--green);border-radius:99px;transition:width .3s}
+.plabel{font-size:.78rem;color:var(--muted);font-weight:600;min-width:60px;text-align:right}
+
+/* ---- Card area ---- */
+.card-area{
+  width:100%;max-width:580px;padding:16px 20px;flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;min-height:340px;
+}
+.perspective{perspective:900px;width:100%;max-width:460px;height:320px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.flipper{
+  width:100%;height:100%;position:relative;transition:transform .45s;transform-style:preserve-3d;
+}
+.flipper.flipped{transform:rotateY(180deg)}
+.face{
+  position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:var(--r);display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 28px;text-align:center;box-shadow:var(--shadow);
+}
+.front{background:var(--card);border:2px solid var(--line)}
+.back{background:var(--accent2);transform:rotateY(180deg)}
+.front-kr{font-family:"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;font-weight:900;font-size:clamp(1.8rem,6vw,2.6rem);line-height:1.15;color:var(--ink)}
+.front-hint{margin-top:14px;font-size:.82rem;color:var(--muted);font-weight:500}
+.front-chap{position:absolute;top:16px;left:20px;font-size:.7rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em}
+.front-num{position:absolute;top:16px;right:20px;font-size:.78rem;font-weight:700;color:var(--muted)}
+.back-fr{font-weight:700;font-size:clamp(1.2rem,4vw,1.6rem);color:#fff;line-height:1.3}
+.back-ex{margin-top:18px;font-size:.9rem;color:rgba(255,255,255,.75);line-height:1.5;max-width:90%}
+.back-ex b{color:#fff;font-weight:600}
+.tap-hint{margin-top:10px;font-size:.75rem;color:var(--muted);font-weight:500;opacity:.7}
+
+/* ---- Controls ---- */
+.controls{
+  width:100%;max-width:580px;padding:6px 20px 10px;display:flex;align-items:center;justify-content:center;gap:14px;
+}
+.cbtn{
+  border:none;background:var(--card);width:56px;height:56px;border-radius:50%;
+  display:grid;place-items:center;font-size:1.4rem;cursor:pointer;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);border:1.5px solid var(--line);
+  transition:transform .12s,box-shadow .12s;
+}
+.cbtn:hover{transform:scale(1.08);box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.cbtn:active{transform:scale(.95)}
+.cbtn.green{background:var(--green-soft);border-color:var(--green);color:var(--green)}
+.cbtn.red{background:#FDECEA;border-color:var(--accent);color:var(--accent)}
+.cbtn.accent{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.middle-controls{display:flex;gap:10px;align-items:center}
+
+/* ---- Bottom bar ---- */
+.bottombar{
+  width:100%;max-width:580px;padding:8px 20px 24px;display:flex;gap:10px;justify-content:center;
+}
+.bbtn{
+  border:none;background:var(--card);color:var(--ink);font-size:.82rem;font-weight:600;
+  padding:10px 18px;border-radius:14px;cursor:pointer;border:1.5px solid var(--line);
+  font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:6px;
+}
+.bbtn:hover{border-color:var(--accent2);color:var(--accent2)}
+.bbtn.active-mode{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* ---- Done screen ---- */
+.done{text-align:center;padding:40px 20px}
+.done h2{font-size:1.6rem;margin-bottom:8px}
+.done p{color:var(--muted);margin-bottom:20px}
+.done button{
+  border:none;background:var(--accent2);color:#fff;font-size:1rem;font-weight:700;
+  padding:14px 32px;border-radius:14px;cursor:pointer;font-family:inherit;
+}
+
+/* ---- Responsive ---- */
+@media(max-width:500px){
+  .perspective{height:280px}
+  .face{padding:24px 20px}
+  .controls{gap:10px}
+  .cbtn{width:50px;height:50px;font-size:1.2rem}
+}
+
+/* keyboard focus */
+.cbtn:focus-visible,.fbtn:focus-visible,.bbtn:focus-visible{outline:3px solid var(--accent2);outline-offset:2px}
+/* mastery badge on card */
+.mastered-badge{position:absolute;top:44px;right:20px;font-size:.7rem;font-weight:700;color:var(--green);background:var(--green-soft);padding:3px 9px;border-radius:99px}
+/* filter % */
+.fpct{font-style:normal;font-weight:700;margin-left:7px;font-size:.72rem;opacity:.85;padding:1px 6px;border-radius:99px;background:rgba(0,0,0,.06)}
+.fbtn.active .fpct{background:rgba(255,255,255,.22)}
+
+/* progression overlay */
+.overlay{position:fixed;inset:0;background:rgba(26,29,43,.5);display:none;align-items:flex-end;justify-content:center;z-index:50}
+.overlay.show{display:flex}
+.panel{background:var(--bg);width:100%;max-width:580px;max-height:86vh;overflow-y:auto;border-radius:24px 24px 0 0;padding:22px 22px 30px;box-shadow:0 -8px 40px rgba(0,0,0,.2)}
+@media(min-width:600px){.overlay{align-items:center}.panel{border-radius:24px}}
+.panel-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.panel-head h2{font-size:1.3rem}
+.panel-close{border:none;background:var(--card);width:36px;height:36px;border-radius:50%;font-size:1rem;cursor:pointer;border:1.5px solid var(--line);color:var(--muted)}
+.panel-overall{display:flex;align-items:center;gap:18px;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:18px;margin-bottom:18px}
+.ov-ring{--p:0;flex:none;width:84px;height:84px;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(var(--green) calc(var(--p)*1%), var(--line) 0)}
+.ov-ring span{width:64px;height:64px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-weight:800;font-size:1.2rem;color:var(--green)}
+.ov-txt{font-size:.95rem;line-height:1.4}
+.ov-txt b{font-size:1.15rem;color:var(--ink)}
+.ov-txt small{color:var(--muted)}
+.panel-list{display:flex;flex-direction:column;gap:13px}
+.prow-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
+.prow-name{font-weight:600;font-size:.92rem}
+.prow-pct{font-weight:700;color:var(--accent2);font-size:.9rem}
+.prow-pct small{color:var(--muted);font-weight:500}
+.prow-bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.prow-fill{height:100%;background:var(--accent2);border-radius:99px;transition:width .4s}
+.panel-reset{margin-top:22px;width:100%;border:1.5px solid var(--line);background:transparent;color:var(--muted);
+  padding:11px;border-radius:12px;font-family:inherit;font-size:.85rem;font-weight:600;cursor:pointer}
+.panel-reset:hover{border-color:var(--accent);color:var(--accent)}
+</style>
+<meta name="theme-color" content="#3C4A8C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Korean Flash">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%20%22Korean%20Flash%22%2C%20%22short_name%22%3A%20%22Korean%20Flash%22%2C%20%22start_url%22%3A%20%22.%22%2C%20%22display%22%3A%20%22standalone%22%2C%20%22background_color%22%3A%20%22%23F5F0E8%22%2C%20%22theme_color%22%3A%20%22%233C4A8C%22%2C%20%22icons%22%3A%20%5B%7B%22src%22%3A%20%22data%3Aimage/png%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAMAAAADACAIAAADdvvtQAAAJZUlEQVR4nO3df1DT9x3H8U9CQFASEOU3FKE6QQiV%2BrPKrB3FX0jZOnfl6o1b17p11TvOzdaePW/XXe2qZ1fn7F3n2vWs69R2w2N2RdlktAVFsFqQXwLyw2KAgChJJIH8YH9w59SuSD7vkO/n%2B%2BX1OP/y8sn3ffq85JNvkm9U6ev2MgBeaqkHAHlDQECCgIAEAQEJAgISBAQkCAhIEBCQICAgQUBAgoCABAEBCQICEgQEJAgISBAQkCAgIEFAQIKAgAQBAQkCAhIEBCQICEgQEJAgICBBQECCgIAEAQEJAgISBAQkCAhIEBCQICAgQUBAgoCABAEBiUbqATwsOjI4wN%2BXY2Fvn2XAbPX4PIqntIC2569K08dyLNx74F%2BFRTUenGTjhsXPP/NdjoVnKlu3v3rcg5NMKDyFAQkCAhIEBCQICEgQEJAgICBBQECCgIAEAQEJAgISgd7KOH08389Psnm2bcnctiWTeCefnLq0e3%2BxR%2BaRCzwCAQkCAhIEBCQICEgQEJAgICBBQECCgIAEAQEJAgISBAQkCAhIEBCQCPRufO91i5%2Bvj9RTkJgtNqlH8DaBAsp97j2pRwC34SkMSAR6BPI4tUoVGDhFpw3Qaf1H/zidLpPZZjLbBsxWs9k2aB0eGZF6SplTVEBqlWrWAzOSk6L0SVHJiZGx0SEq1Vi3dzhcLW29dY2GS/WGukZDt9HkrUmVQwkBqVWqhWlxOetSF6Q%2BMG3alPEv1GjUiXPCE%2BeE/zA7jTHW128pP9da%2BGl1c6txwoZVGnkHFBI8dV1myhNrUyPDg%2Bj3NjMkMGdtas7a1LrGrsJPq0u%2BuDw07KDfrbLJNSB/f99NP17%2B5Po0jcbzrwOSEyOTEyO3bFp58NAX/zhZg33SGFTp6/ZKPYPbli6M/9XmxyPCdF44Vk3dtT37izs6%2B91dyH2BqfEr%2Bnfd62%2BdnNBD3JfMHoG0gf5bf/G9zJVJXjtianL0%2B2/nHT527tCRChcei75BTgEFBwW8tetHs%2BNDvXxcX43PTzcui42e/tqbRS4XGrqLbE4kzgiZdmB3rvfruS1zZdJvXs6eiC2XrMnjnyMsVHtgd25cbIi0Yzy6fM6uV3J8Zf6GnWfJICC1WvXajidiooKlHoQxxpYtTnj%2BJxO7NZYXGQSU%2B%2BTCpO9ESD3F/2zIeTglKUrqKUQhekBxMSHPblwm9RR3UatUO7aukfA6EEIRPaDt%2BasE/K%2BKjZ7%2BzNOPSD2FEIQOaO7scP28aKmn%2BP9y1qZiN80EPw%2B0JmMe8R4uVF/9T3lTj9HUbTR1G01%2BGk14mC4iTBcdFZyVmUJ5WacN9F%2B2OOGz8mbihHInbkA%2BPurHH%2BU/41xa1vSXjysvt/Tc%2BZdWZh8wW5uu9DDGjhZULV8yO%2B%2BpJdw79DUZyQhI3ICWLJgVHBTAt3bfOyV/P3Fx7NuMjLCyipazVa07tq5Z9RhPqUsXxAfpAgZMk/o3fsTdA/H96A5j7JPiS/et5zan0/XGvlNtHdc5DqTRqPWT/vW8uAElzJrJscrlGjl4qMytJXaH80%2BH3VtyG9%2BQSiLuU1hURDDHqq8ufX3j5qC7qyrOt1mt9oAAt3%2Bpjm/Isd0csN6zdfs2V9p7PX50d4kb0LSpfhyr2r92%2B4M7jDG73Wnovvmg%2B%2B/UBrrzCdpxqr/chR%2Bc8wC%2BX6408f5s5YCZ5zuB/lxDKom4AVltdo5VOi3nC7cgrT/HKhvXkEoibkC3Boc5VsXF8Jwb9NX48O1mbg0OcaxSEnED6jYOcKyar4/hOHu0ZGE8xw6aMdbVwzOkkogbUGt7H8cqHx/1z/LS3Vqi0ag35S3nOBZj7ArXkEoibkBf1XbyLVy/OvUHWfPHeWO1WvVy/uqEOM5zTnUNBo6FSiLuy/iKqjaT2aZzf2%2BrUrFfvpDxUErMh3%2BrbL7yrd8xVanYI4sS8p5ampwYyTdh5YX2fvfPOSmMuAHZHc6Szy9/P%2BshvuUZK%2BZmrJhbdbHjs/Kmrh5TT6/J2GfW%2BPhEhOnCQ7XRUcFZmfr4uBmUCU%2BerqcsVwZxA2KMnSqp5w5o1KK0uEVpcZ6a506D1uGyipaJuGd5EXcPxBirbTSMfvRCQP8srsU355ngATHG3thX7HS6pJ7iXt1G07uHy6WeQgiiB9Tcajz8UaXUU9xrz/7iQSvPeU7lET0gxtgHRytaOwQ63XLiZE3VxQ6ppxCFDAKyO5w7Xz/R12%2BRehDGGKuu6/zDu6VSTyEQGQTEGLva2b/5xaOSX4Ku6mLHtp0FVutkfwP1TvIIiDFm6B7Y/NLRTsMNqQY4U9m6/dXjtiHUcxfZBMQYM/aaN790rOJ8m5eP63KNfFT45Su7Cu12p5cPLT6hTyR%2BU/%2BNWy/%2BuiBjRWL%2Bzx%2BbHjzVC0dsaevds7%2B4oanbC8eSI5kFNOr0542VF9pfeHZFVqZ%2B7Av5UtiG7O//9eyx418KeCJKHLIMiDFmtth2/774g6Pnstfos1bpQzz6aNTWcb2wqPpUSb3l1mT/vNh9yTWgUV09AwcPlf35wzPpS2dnr9bPT4mhXInBbLGdrWorLKquqbvmwSGVTd4BjXI4XKVlTaVlTRqNek5CWEpSVHJiVEpSZHjofS7j6hoZ6bjaX9doqG001DYYrnb24yqa7lJCQLc5HK6Gpu6Gpu6PCy8wxvz8NLpAf612ii4wQHvHb2WYzTaTxWYyW82WIexviBQV0D2Ghx19/RZBTmErlZzOA4GAEBCQICAgkese6MH40LCZWo6F/TdujfPSBTAecg1oQ3ba%2BtV6joWlZU07f3vC4/NMWngKAxIEBCQICEgQEJDIdRMtPpfLNcz1xTGHU04fW0NAE%2BVIwfkjBeelnmLC4SkMSBAQkCAgIEFAQIKAgAQBAQkCAhIEBCQICEgQEJBMurcydLqAeXM5r%2Bvrfc2tRsGv6DDpAno4NfaPv3ta6inGK/e596513ZR6irHgKQxIEBCQICAgQUBAgoCABAEBCQICEgQEJAgISBAQkCAgIEFAQIKAgAQBAYkqfd1eqWcAGcMjEJAgICBBQECCgIAEAQEJAgISBAQkCAhIEBCQICAgQUBAgoCABAEBCQICEgQEJAgISBAQkCAgIEFAQIKAgAQBAQkCAhIEBCQICEgQEJAgICBBQECCgIAEAQEJAgISBAQkCAhIEBCQICAgQUBAgoCABAEBCQICEgQEJAgISBAQkCAgIPkvwpyGdvsZ07kAAAAASUVORK5CYII%3D%22%2C%20%22sizes%22%3A%20%22192x192%22%2C%20%22type%22%3A%20%22image/png%22%7D%2C%20%7B%22src%22%3A%20%22data%3Aimage/png%3Bbase64%2CiVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAIAAAB7GkOtAAAZYElEQVR4nO3deZScdZ3v8ep9y9LppANkIWQDsrImAUMgXAgSUBiHRUFEkDMIODhXEb0qLtcZxyuIzjCoONc7II6gog4CKoQlMRDZCRBICNlJQiDdCSHp7vSW7vsHHnWwCVm683uqv6/XHznAIalPTiX1rnqq6nkKjjvtWzkA4ilMPQCANAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAIKji1APIur993%2BGfuvyk1Cu68LsHXvzn79ybekX369%2B34oZvnpt6RReatrdeftXtqVfQnQQAsqWoqGDUiEGpV3ShobEl9QS6mUNAAEEJAEBQAgAQlAAABCUAAEEJAEBQAgAQlAAABCUAAEEJAEBQAgAQlAAABCUAAEEJAEBQAgAQlAAABCUAAEEJAEBQAgAQlAAABCUAAEEJAEBQAgAQlAAABCUAAEEJAEBQxakHRDFsyIALPzgt9Yo9MWJ4TeoJXZs0fugXPnVq6hV74v55S55cuCb1ChCAfWVAdeXskyekXtGrDBtSPWxIdeoVe2LZyo0CQBY4BAQQlAAABCUAAEEJAEBQAgAQlAAABCUAAEEJAEBQAgAQlAAABCUAAEEJAEBQAgAQlAAABCUAAEEJAEBQAgAQlAAABCUAAEEJAEBQAgAQlAAABCUAAEEJAEBQAgAQlAAABCUAAEEJAEBQAgAQlAAABCUAAEEJAEBQAgAQlAAABCUAAEEJAEBQAgAQlAAABFWcekAUixavn3H69alXAPyZVwAAQQkAQFACABCUAAAEJQAAQQkAQFACABCU7wGwtwoKcv37VdQO6jt4UN/aQX1qB/atHdRn4ICqsrListKSstLisrLiP/1YVFzY2tLe0tre0tLe0tre3NLW0tre2tLe0NRSV99QV99Qt2nbn35saW1P/ZuD3kwA2G2Da/uOHTV4zMjaMSNrx4yq3W9wv5Liol3/6eXlJeXlJbvyf27d1rxm7ablq%2BqWraxbvnLjqjWbmlva9nQ18HYCwLurrCg9YvLwIycPHzt68JiRtX37lO%2Bb2%2B3Xt3zS%2BKGTxg996187OjvXrn9j%2Bcq6xUs3PLVwzco19ftmBvRWAkDXiooKxx9ywNGHHzjliBHjDzmgqCj920WFBQUjhtWMGFZz0vGH5HK5zW80PvXsK08uXP30s6/UbWpIvQ7yjwDw35SVFk%2BfNnrWzEOPPOzAyorS1HN2pmZA1SknjjvlxHG5XG7N2s0PP7Z8ztzFq9ZsSr0L8oYAkMvlcoUFBUccNvy9J44/YfrYjD/ud2nE8JoRw6decM7UZSs3zpm75IF5L9Vv9poA3oUARHfgsJr3v3fSrJnjBtZUpd7SDcaOGjx21ODLP3b8M8%2B9ct9Dix/8/dK29h2pR0FGCUBcE8cN%2BfDZU6ZPG1NQkHpKdyssKDj68BFHHz7isouOv%2BPXz9z5u%2BcaG1tSj4LMEYBwCgsKph8z%2BvyzpkwcNyT1lh43sKbqsotnXPihaXffu%2Bjnv356Y9221IsgQwQgkIKC3KyZ4y4679jhQwek3rJPVVaUfvADR519xhH3z3vphz9e8Hrd1tSLIBMEIIoJhx7wyUtPHH/IAamHJFNUVHjqSeNPnHHw7b986ie/eKK52XfKiK7guNO%2BlXoDPat2UN/LLpoxa%2Ba43nesf4/Vb2646eaH58xd3NmZespfqamu/PVPLk%2B9ogtvfRFvX97ixZ%2B41Xv4PcorgN6spLjow%2BdM/fA5U8rLdunUC3EMqulzzVWzz3r/Ed/%2B3gMvLXs99Zz88NYX8fbpTXrK0sPSf72THjJieM0Pvn3%2BJRe8x6P/Oxl38P43XX/%2BRecdU1jokYaIBKB3%2BsDph/%2B/Gz4ydvTg1EOyrqio8JILpt/4zQ8esF//1FtgXxOA3qamuvLar/7tp684qazU8b1dNWn80JtvvPDUk8anHgL7lAD0KodNGHbLdz967JSRqYfkn6rK0i9%2BevaXPnNaSclunNoa8poA9B4nn3Dod75%2B9oDqytRD8tgpJ477l6%2Bf06/vPjrfNaQlAL3EBedM/fLVp3v2uvcmTxh60/XnD9nfWwL0fgKQ94qKCq%2B%2BctbHL5rhY/7dZfjQATddf37kL80RhADkt5Liom986cwzTp2cekhvM6C68ob/c%2B7UIw9KPQR6kADkscKCgi9dfdqxU0alHtI7lZUWf/2aM/50QUrofQQgj1195awTjzs49YrerLys5NqvfmDMyNrUQ6BHCEC%2BuuJjx7/vvZNSr%2Bj9%2BlSVXf9PZw8bUp16CHQ/AchLF5wz9byzpqReEUVNdeV3/umc2oF9Ug%2BBbiYA%2BefYKSMv/eiM1Cti2X%2B/fl/7wvuLivx9oVfxBzrP1A7s88VPz/aJz31v4qFDLr3wuNQroDsJQD4pLCz4yudO79%2BvIvWQoM47a8oxRzvNBr2HAOSTSy6YftiEYalXxFVQkLvmqtneDKDXEIC8ceRhB15w7tTUK6Lr36/iK5893SE4egcByA/FxYWf%2BcTJhR54MuCwicNmnzwx9QroBgKQH84%2B48jhQwekXsEfffyiGVWVpalXwN4SgDxQU1150XnHpl7Bn9VUV37UPUL%2BE4A8cOlHPd/MnHPOOHLYEK/JyG8CkHWHjNlv9qwJqVfwdsXFhZ%2B8dGbqFbBXBCDrPvLBad77zaZjp4waO2pw6hWw5wQg0/bfr9%2BMY8akXsE7OufMI1NPgD0nAJl21vuOKCz09D%2B7Tj7hUBdhJn8Vpx7AOyovL8nrEz43NrUuX7Xxtde3Nja1Nja2NDS1NDa2tLbtqKos61NVWlVZ1qeqrG/f8lEjBg0dUp2nh7lKSorOnD35ltsfSz0E9oQAZNfskyb0qSpLvWL3rFqz6ZHHl7%2B8YuPylRvXb9jS2blLP6uiomTMyMEHjx48cdyQ46aNLi8v6eGZ3elvTjv8P%2B94or29I/UQ2G0CkF1nzs6bK/3Wb254YN5Lc%2BYuWbZy4x789O3b2xYtXr9o8fpf3r2wvLzk%2BGPHvPd/jD/68BF5cfhrYE3VcceMmffIy6mHwG4TgIzaf79%2Bo/PhSoSb32j8/s3z5zy0pGMXn%2B2/m%2Bbmtjlzl8yZu6R2UN8rPnb8yScc2i2/bI86btpoASAfCUBGTZ86OvWEd7FjR8cv7lp4821/aGxq7Ylfv65%2B2/%2B%2B9jd3/va5T19%2B0qiDBvXETXSXY6aMLCwo6K4Ewj7jU0AZ9Z6po1JP2Jm6%2Bm0f%2B%2BSPb/zhvB569P%2BT515Yd/GVt/7454/36K3spf59KyaMG5J6Bew2AciiioqSIyYPT73iHa3fsOWKq3%2B6cnX9vrm5jo7Of//RI9%2B/ef6%2Bubk9k/FgQ5cEIIumHnFQSXFR6hVdW7mm/oqrf/raxq37%2BHZv%2B8WT13/vgcweZcn%2BITv4awKQRZl9%2Bt/Y2HLVNb/c/EZjklu/8zfPZfZY0MgRA6v7u1QneUYAsiiz73l%2B9z/m129uSDjgltsffWXd5oQDdmLUiIzea/BOBCCLshmAZxetu%2Be%2B59NuaGvbce0N92fzQNCog/LgY7vwlwQgcwbWVPXvm7mDCZ2duetuzMQj73Mvrrv3oRdTr%2BjCqBEDU0%2BA3SMAmTM6k08kFy1en51jL7%2B574XUE7rgFQB5RwAyJ5vHfx56eGnqCX%2B2aPH6tG9FdGnUiEH5eUY74hKAzBmyf//UE96uo7Pz9wuWpV7xZx2dnRk89UJFRcmA/k4NTT5xKojMqarM3BlAF7%2B0IWvPuOctWHb2GZm7GEtlZdnmLU2pV/SUhsaW2efemHoF3ckrgMzJ4PXfV6/dlHrC22XnDYm/1Kcqc/cd7IQAZE4GrwGwaXOab37txJY3m3bsyNwp%2BKuyd9/BTghA5lRm7xVABgPQ2ZlL9YXknaiqEADyiQBkTgbfA8jaGwBvqc9elqocAiKvCEDmZPCCiFu3Nqee0IU3t25PPeHtKrJ338FOCEDmNDe3pZ7wdv36laee0IX%2B/TL3fent2bvvYCcEIHMam1pST3i7gTVVqSd0YVD2VjX18OVxoHsJQOZk8EFkUE2f1BPerqAgN6A6cwFoyF68YScEIHN6%2BiKLeyCDrwCq%2B1cWF2fuT28G4w07kbm/QjQ0Zu5Z5IhhNaknvN2BQzM3KZfJ%2Bw52QgAyJ4PPIieMG5K1FwEnTB%2BbekIXGgWAvCIAmfPq62%2BmnvB2hQUFM6cfnHrFnxUU5GYel6E9b2luadvyZuY%2BmQo7IQCZs2pNfeoJXThxRoYecCeNH1o7MHPvS69as6kjC1fMgV0mAJmzYnUWAzB5/LDhQwekXvFHp508MfWELmSz3LATApA5dfXbMvheYkFB7jN/Pyv1ilwul5s0fuhps7IYgGyWG3ZCALJoZSYfSo6cPPz0UxI/8pYUF33uk6dk88JbXgGQdwQgi1Zm9aHkE5ecUDMg5ceBLvzQtBHDs/gB0FyG7zV4JwKQRc%2B/uD71hK717VP%2B7X88a0B1mgsfvv/UyRd%2B6JgkN/2u1m/YksGTZsPOCUAWPfbUqo6OjH6eZPTI2u9e%2B6HBtX338e2e%2BzdHffbKWYXZPPqTyy14YkXqCbDbBCCLtjU0L1qc0RcBuVxu%2BNAB37vuQwcdOHDf3FxhQcElF0y/8u9m7pub2zN/eGJl6gmw2wQgoxZk%2BwFlv9p%2B//FvH7ns4hkVFT17BvyJ44b88F8vuOi8jB75eUvT9tbnX8husOGdCEBG/SHzhxRKios%2BfPbUn/zgYyefcGhPHJgZWFP1hU%2Bf%2Br3rzhs7enD3/%2Brd6omnV7e170i9AnZbceoBdG3N2s3rN2wZekB16iHvonZgn6989vTLLp4xZ%2B6S%2B%2BctWbVm017%2BgmWlxdOnjT7lxHHTjhqZwfN9dsnxH/KUAGTXPfct%2BvhFM1Kv2CX71fb7yLnTPnLutGUrNj7y%2BIqXl7%2B%2BbGXd63Vbd/Gnl5YWjz5o0NhRgyeOH3L8sWOrKvPpyroNjS1zF7ycegXsCQHIrrvvXXTR%2BceWlebTfTR29OA/HbHZuq152YqNr23c2tjU0tDY0tjU2tjU0ta2o7KytE9lWWVlaZ%2Bqsn59K0aOGHjQ8IGFhRn9eM%2B7uue%2BRRm8iifsinx6cInmzW3b75%2B75H3vnZR6yB7q17f8qMMPTL2iZ3V0dv7qnmdTr4A9lB/HWMO649fPpJ7Azix4bMWG7J2%2BG3aRAGTayjX1zzz3SuoVvCOFJq8JQNb95x1PpJ5A1xYv3bBw0drUK2DPCUDWPblwzYLHs/6dgIA6O3P/%2BoO5qVfAXhGAPHDjD3/ve0ZZc99Dixcv3ZB6BewVAcgD61594xeONWfJ9u1tN90yP/UK2FsCkB9%2B9NPHNm9pSr2CP7r1Z485%2BTO9gADkh8am1u/%2BcF7qFeRyudyadZt/dufTqVdANxCAvDFn7pL7HlqcekV0ra3tX/7G3W1t3pKhNxCAfPKt7z6wZt3m1CtC%2B5cfzM3mFZthDwhAPmlubvvyN%2B5ubW1PPSSoB%2Be/dPe9z6deAd1GAPLMytX1Pn6exLpXt1x7w/2pV0B3EoD8c9e9z99z36LUK2JpbGy55p/vatremnoIdCcByEvX3Xj/vEecg34faW5pu/qr/7ViVV3qIdDNBCAvdXR0fu263z7xzOrUQ3q/9vaOa75%2B16LFLvlLLyQA%2BaqtfccXv37XCy%2B9mnpIb9bR2fmP3/rt40%2BvTj0EeoQA5LHm5rarv/yrZSs3ph7SO3V25q77t/sfenhp6iHQUwQgvzU0tlz5uZ85FtTtWlvbv/SNu7zZTu8mAHmvsan1s1/9Lw9V3WjLm9v/4fN3/H7BstRDoGcJQG%2BwY0fHN2%2BY8%2B8/eqSzM/WU/Ld2/RuXXXWbN1eIQAB6jx///PGvXfebFt8T3gvPvbDusqtuW79hS%2BohsC8Upx5Ad3rg9y8tX1X35atPGztqcOoteWbHjo5bbn/s1p891tHhZRRReAXQ26x%2BZdPHP3Xbbb94ssPxoF227tUtl3/m9ltuf9SjP6EIQC/U1r7j%2BzfP/5%2Bfv2Nj3bbUW/LAPfctuvjKW5e8/FrqIbCvCUCvtXDR2o9%2B4kf33LfIS4F38trrWz//tTu/ecOc5ua21FsgAe8B9GYNjS3fvGHOr%2B559spLZx4xaXjqORmyfXvbj3/%2B%2BM/ufNq5tYlMAHq/ZSs3fvJ//fz4Y8deccnxQw%2BoTj0nsY7Ozt/e/8L/vXXB5jdc1JfoBCCK%2BY8ue/TJlWefeeT5Z02p7l%2BRek4aTy5c8/2b5y9b4eQZkMsJQCht7Ttu/%2BWTv7p74eyTJ3zwA0cNGzIg9aJ9ZMeOjgfnL/3pr55y3iT4SwIQTktr%2B52/fe6u3z1/3DFjzjvr6InjhqRe1IOatrfefe%2BiO379zOt1W1NvgcwRgKA6OjvnP7ps/qPLJo4bcsbsySe8Z2xlRWnqUd1p%2Baq6ex988Z45LzQ2tqTeAhklANG9sOTVF5a8ev2ND0yfNnrWzEOnHT2ypLgo9ag999rrW%2B%2Bft2TOvCWrX9mUegtknQCQy%2BVyLa3tDz289KGHl/btU37icQefdPwhkyYMzaMS1NVve%2BTxFXPmLnnxpVd97QF2kQDw32xraL7r3ufvuvf58rKSyROGHn3EiKMPP3DMyMEFBamX/ZXGxpZnnl/71LNrnnr2lVfWbU49B/KPANC15pa2J55Z/dalZqr7Vxx12IGHTxp%2B8OjBo0YMKi8vSbXqtY1bV6yqe3HphqcWrlm6/HWn7oG9IQC8uy1vbn9w/tIH5y/N5XKFBQVDh1SPHlk7ZmTtmJG1o0fWDh7Ut7CwR14gNG1vXbN284rVdctX1i1fVbdiVV2Dd3Sh%2BwgAu6ejs3Pt%2BjfWrn9j3iMvv/VfCgsLBg6oGjSwz%2BBBfQcN7FM7qE/twL4DqivLy4rLyorLSkvKSotLy4rLSopKy4qLigpbW9tbWttbW9pbWne89c8tLe0NTS319Q11m7bVbWqo39SwsX5b/aaGxqbWtL9Z6N0EgL3V0dFZt6mhblODE2pCfnE2UICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIJyMrjer3Zgn0PG7p96RdcWPL7cBbwgFQHo/SZPGPrVz70v9YqunfD%2Bb3cqACTiEBBAUAIAEJQAAAQlAABBCQBAUAIAEJQAAAQlAABBCQBAUAIAEJQAAAQlAABBCQBAUAIAEJTTQUO2dHR2bn6jMfWKLjQ2taaeQDcTAMiWLW9uP/OCm1KvIASHgACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCKk49gNCu/LuZHZ2dqVfQDW657bFtDc2pV7B7BICUzj7jyNQT6B533PmMAOQdh4AAghIAgKAEACAoAQAISgAAghIAgKAEACAoAQAISgAAghIAgKAEACAoAQAISgAAghIAgKAEACAoAQAISgAAghIAgKAEACAoAQAISgAAghIAgKAEACAoAQAISgAAghIAgKAEACAoAQAISgAAghIAgKAEACAoAQAISgAAghIAgKAEACAoAQAISgAAghIAgKAEACCoguNO%2B1bqDQAk4BUAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABCUAAAEJQAAQQkAQFACABDU/we3ZumdOYI2mwAAAABJRU5ErkJggg%3D%3D%22%2C%20%22sizes%22%3A%20%22512x512%22%2C%20%22type%22%3A%20%22image/png%22%2C%20%22purpose%22%3A%20%22any%20maskable%22%7D%5D%7D">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><span>🇰🇷</span> Korean Flash</div>
+  <div class="topcount" id="topcount"></div>
+</div>
+
+<div class="filters" id="filters"></div>
+<div class="progress-wrap"><div class="pbar"><div class="pfill" id="pfill"></div></div><div class="plabel" id="plabel"></div></div>
+
+<div class="card-area" id="cardArea"></div>
+
+<div class="controls" id="controls">
+  <button class="cbtn red" id="bPrev" title="Précédent (←)">←</button>
+  <div class="middle-controls">
+    <button class="cbtn green" id="bKnow" title="Je connais (↓)">✓</button>
+    <button class="cbtn accent" id="bFlip" title="Retourner (Espace)">↻</button>
+    <button class="cbtn" id="bDontKnow" title="Je ne sais pas (↑)" style="color:var(--accent)">✗</button>
+  </div>
+  <button class="cbtn" id="bNext" title="Suivant (→)">→</button>
+</div>
+
+<div class="bottombar">
+  <button class="bbtn" id="bProgress">📊 Progression</button>
+  <button class="bbtn" id="bShuffle">🔀 Mélanger</button>
+  <button class="bbtn" id="bReset">🔄 Recommencer</button>
+  <button class="bbtn" id="bOnlyWrong">❌ Revoir ratées</button>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="panel">
+    <div class="panel-head">
+      <h2>📊 Ma progression</h2>
+      <button class="panel-close" id="panelClose">✕</button>
+    </div>
+    <div class="panel-overall" id="panelOverall"></div>
+    <div class="panel-list" id="panelList"></div>
+    <button class="panel-reset" id="panelReset">Réinitialiser ma progression</button>
+  </div>
+</div>
+
+<script>
+// ============ CARD DATA ============
+const DATA=[
+// Ch1 Météo
+{t:"기온이 높다",d:"Les températures sont élevées",ex:"기온이 높아서 날씨가 더워요.",exf:"Il fait chaud car les températures sont élevées.",ch:"Ch.1 Météo"},
+{t:"기온이 낮다",d:"Les températures sont basses",ex:"기온이 낮아서 날씨가 추워요.",exf:"Il fait froid car les températures sont basses.",ch:"Ch.1 Météo"},
+{t:"장마",d:"La saison des pluies",ex:"장마가 와요.",exf:"La saison des pluies arrive.",ch:"Ch.1 Météo"},
+{t:"태풍",d:"Le typhon",ex:"태풍이 와요. 바람이 강하게 불어요.",exf:"Le typhon approche. Le vent souffle fort.",ch:"Ch.1 Météo"},
+{t:"사계절",d:"Les quatre saisons",ex:"한국에는 사계절이 있어요.",exf:"Il y a quatre saisons en Corée.",ch:"Ch.1 Météo"},
+{t:"햇빛",d:"La lumière du soleil",ex:"햇빛이 강해요.",exf:"La lumière du soleil est forte.",ch:"Ch.1 Météo"},
+{t:"선선하다",d:"Être frais (agréable)",ex:"가을이 되니까 날씨가 선선해요.",exf:"Le temps est frais car c'est l'automne.",ch:"Ch.1 Météo"},
+{t:"쌀쌀하다",d:"Être froid (désagréable)",ex:"날씨가 쌀쌀해요.",exf:"Il fait froid.",ch:"Ch.1 Météo"},
+{t:"구름이 끼다",d:"Être nuageux",ex:"구름이 껴서 해가 보이지 않아요.",exf:"Il est nuageux, on ne voit pas le soleil.",ch:"Ch.1 Météo"},
+{t:"안개가 끼다",d:"Avoir du brouillard",ex:"안개가 껴서 운전할 수 없어요.",exf:"Il y a du brouillard, je ne peux pas conduire.",ch:"Ch.1 Météo"},
+{t:"바람이 불다",d:"Le vent souffle",ex:"바람이 많이 불어서 추워요.",exf:"Il fait froid car il y a beaucoup de vent.",ch:"Ch.1 Météo"},
+{t:"비가 그치다",d:"La pluie s'arrête",ex:"비가 그쳐서 우산을 쓰지 않아요.",exf:"La pluie s'est arrêtée.",ch:"Ch.1 Météo"},
+{t:"날씨가 좋다/나쁘다",d:"Il fait beau / mauvais",ex:"오늘은 날씨가 좋아요.",exf:"Il fait beau aujourd'hui.",ch:"Ch.1 Météo"},
+{t:"비가 오다/내리다",d:"Pleuvoir",ex:"비가 오니까 우산을 쓰세요.",exf:"Il pleut, prenez un parapluie.",ch:"Ch.1 Météo"},
+{t:"계절이 바뀌다",d:"La saison change",ex:"계절이 바뀌고 있어요.",exf:"La saison change.",ch:"Ch.1 Météo"},
+// Ch2 Shopping
+{t:"명동",d:"Myeong-dong (cosmétiques)",ex:"명동에는 화장품 가게가 많이 있어요.",exf:"Il y a beaucoup de boutiques de cosmétiques.",ch:"Ch.2 Shopping"},
+{t:"동대문",d:"Dongdaemun (vêtements)",ex:"동대문에는 옷 가게가 많이 있어요.",exf:"Il y a beaucoup de magasins de vêtements.",ch:"Ch.2 Shopping"},
+{t:"시장",d:"Le marché",ex:"시장에서 옷을 사요.",exf:"J'achète des vêtements au marché.",ch:"Ch.2 Shopping"},
+{t:"카페",d:"Le café",ex:"카페에서 친구를 만나요.",exf:"Je rencontre un ami dans un café.",ch:"Ch.2 Shopping"},
+{t:"더럽다",d:"Être sale",ex:"거리가 더러워요.",exf:"La rue est sale.",ch:"Ch.2 Shopping"},
+{t:"깨끗하다",d:"Être propre",ex:"거리가 깨끗해요.",exf:"La rue est propre.",ch:"Ch.2 Shopping"},
+{t:"복잡하다",d:"Être bondé / compliqué",ex:"길이 복잡해요.",exf:"La rue est bondée.",ch:"Ch.2 Shopping"},
+{t:"시끄럽다",d:"Être bruyant",ex:"그곳은 너무 시끄러워요.",exf:"C'est trop bruyant là-bas.",ch:"Ch.2 Shopping"},
+{t:"그러면",d:"Alors, dans ce cas",ex:"그러면 비빔밥은 어때요?",exf:"Alors, et le bibimbap ?",ch:"Ch.2 Shopping"},
+{t:"알겠어요",d:"D'accord / compris",ex:"알겠어요. 같이 청소해요.",exf:"D'accord. Nettoyons ensemble.",ch:"Ch.2 Shopping"},
+// Ch3 Apparence
+{t:"멋있다",d:"Être beau / cool",ex:"제 남자친구는 아주 멋있어요.",exf:"Mon petit ami est très beau.",ch:"Ch.3 Apparence"},
+{t:"귀엽다",d:"Être mignon",ex:"제 동생은 정말 귀여워요.",exf:"Mon petit frère est mignon.",ch:"Ch.3 Apparence"},
+{t:"얼굴",d:"Le visage",ex:"그 사람의 얼굴을 알아요?",exf:"Connaissez-vous son visage ?",ch:"Ch.3 Apparence"},
+{t:"까만색",d:"Noir",ex:"까만색 바지를 입고 있어요.",exf:"Je porte un pantalon noir.",ch:"Ch.3 Apparence"},
+{t:"빨간색",d:"Rouge",ex:"제 가방은 빨간색이에요.",exf:"Mon sac est rouge.",ch:"Ch.3 Apparence"},
+{t:"하얀색",d:"Blanc",ex:"하얀색 모자를 좋아해요.",exf:"Il aime les chapeaux blancs.",ch:"Ch.3 Apparence"},
+{t:"파란색",d:"Bleu",ex:"파란색 티셔츠를 자주 입어요.",exf:"Il porte souvent un T-shirt bleu.",ch:"Ch.3 Apparence"},
+// Ch4 Courses
+{t:"마트",d:"Le supermarché",ex:"마트에서 장을 봐요.",exf:"Je fais les courses au supermarché.",ch:"Ch.4 Courses"},
+{t:"공짜",d:"Gratuit (familier)",ex:"하나는 공짜예요.",exf:"Un est gratuit.",ch:"Ch.4 Courses"},
+{t:"할인",d:"Rabais / réduction",ex:"할인 받을 수 있어요?",exf:"Puis-je avoir une remise ?",ch:"Ch.4 Courses"},
+{t:"고추장",d:"Gochujang (pâte de piment)",ex:"떡볶이에는 고추장이 필요해요.",exf:"Le tteokbokki nécessite du gochujang.",ch:"Ch.4 Courses"},
+{t:"된장",d:"Doenjang (pâte de soja)",ex:"된장찌개에는 된장이 필요해요.",exf:"Le doenjang-jjigae nécessite du doenjang.",ch:"Ch.4 Courses"},
+{t:"간장",d:"Sauce soja",ex:"간장을 많이 넣어서 짜요.",exf:"C'est salé car j'ai mis beaucoup de sauce soja.",ch:"Ch.4 Courses"},
+{t:"소고기",d:"Le bœuf",ex:"소고기로 불고기를 해 먹어요.",exf:"On fait du bulgogi au bœuf.",ch:"Ch.4 Courses"},
+{t:"돼지고기",d:"Le porc",ex:"삼겹살을 좋아해요.",exf:"J'aime le samgyeopsal.",ch:"Ch.4 Courses"},
+{t:"닭고기",d:"Le poulet",ex:"닭고기를 튀겨서 치킨을 만들어요.",exf:"On frit le poulet pour faire du poulet frit.",ch:"Ch.4 Courses"},
+{t:"야채",d:"Le légume",ex:"고기와 야채를 같이 먹어야 해요.",exf:"Il faut manger viande et légumes.",ch:"Ch.4 Courses"},
+{t:"쌀",d:"Le riz (cru)",ex:"쌀을 씻어서 밥을 지어요.",exf:"Lavez le riz et faites-le cuire.",ch:"Ch.4 Courses"},
+{t:"밀가루",d:"La farine",ex:"빵을 만들 거예요. 밀가루가 필요해요.",exf:"Je vais faire du pain. J'ai besoin de farine.",ch:"Ch.4 Courses"},
+// Ch5 Commande
+{t:"예약",d:"La réservation",ex:"이 메뉴는 예약하셔야 돼요.",exf:"Vous devez réserver pour ce menu.",ch:"Ch.5 Commande"},
+{t:"주문",d:"La commande",ex:"저희 주문할게요.",exf:"Nous aimerions commander.",ch:"Ch.5 Commande"},
+{t:"취소",d:"L'annulation",ex:"메뉴 하나는 취소하고 싶어요.",exf:"Je voudrais annuler un plat.",ch:"Ch.5 Commande"},
+{t:"포장",d:"À emporter",ex:"이 음식을 포장해 주세요.",exf:"Ce plat à emporter, s'il vous plaît.",ch:"Ch.5 Commande"},
+{t:"접시",d:"L'assiette",ex:"이 접시에 음식을 담으세요.",exf:"Mettez la nourriture dans cette assiette.",ch:"Ch.5 Commande"},
+{t:"숟가락",d:"La cuillère",ex:"숟가락 좀 바꿔 주세요.",exf:"Changez-moi la cuillère.",ch:"Ch.5 Commande"},
+{t:"젓가락",d:"Les baguettes",ex:"젓가락으로 자장면을 먹어요.",exf:"Je mange avec des baguettes.",ch:"Ch.5 Commande"},
+{t:"수저",d:"Cuillère + baguettes",ex:"여기 수저 좀 주세요.",exf:"Donnez-moi des couverts.",ch:"Ch.5 Commande"},
+{t:"계산",d:"L'addition / paiement",ex:"계산을 할까요?",exf:"On paie ?",ch:"Ch.5 Commande"},
+{t:"영수증",d:"Le reçu",ex:"영수증을 드릴까요?",exf:"Souhaitez-vous un reçu ?",ch:"Ch.5 Commande"},
+// Ch6 Vacances
+{t:"하루",d:"Un jour / une journée",ex:"하루 동안 방을 청소해요.",exf:"Je nettoie ma chambre pendant une journée.",ch:"Ch.6 Vacances"},
+{t:"이틀",d:"Deux jours",ex:"이틀 동안 수영을 배워요.",exf:"J'apprends à nager pendant deux jours.",ch:"Ch.6 Vacances"},
+{t:"사흘",d:"Trois jours",ex:"사흘 동안 시험을 봐요.",exf:"Je passe un examen pendant trois jours.",ch:"Ch.6 Vacances"},
+{t:"해외여행",d:"Voyage à l'étranger",ex:"해외여행을 갈 거예요.",exf:"Je pars à l'étranger.",ch:"Ch.6 Vacances"},
+{t:"항공권",d:"Billet d'avion",ex:"항공권을 싸게 샀어요.",exf:"J'ai acheté mon billet d'avion à bas prix.",ch:"Ch.6 Vacances"},
+{t:"기차표",d:"Billet de train",ex:"기차표를 샀어요.",exf:"J'ai acheté un billet de train.",ch:"Ch.6 Vacances"},
+{t:"경치",d:"Le paysage",ex:"경치가 아름다워요.",exf:"Le paysage est magnifique.",ch:"Ch.6 Vacances"},
+{t:"관광",d:"Le tourisme",ex:"거기에 가서 관광을 할 거예요.",exf:"Je vais y faire du tourisme.",ch:"Ch.6 Vacances"},
+// Ch7 Santé
+{t:"내과",d:"Médecine interne",ex:"배가 아파서 내과에 가요.",exf:"J'ai mal au ventre, je vais en médecine interne.",ch:"Ch.7 Santé"},
+{t:"치과",d:"Le dentiste",ex:"이를 뽑으러 치과에 가요.",exf:"Je vais chez le dentiste.",ch:"Ch.7 Santé"},
+{t:"기침",d:"La toux",ex:"감기에 걸려서 기침이 나요.",exf:"Je tousse car j'ai un rhume.",ch:"Ch.7 Santé"},
+{t:"두통",d:"Le mal de tête",ex:"스트레스를 받아서 두통이 생겼어요.",exf:"J'ai mal à la tête à cause du stress.",ch:"Ch.7 Santé"},
+{t:"배탈",d:"Maux d'estomac",ex:"매운 음식을 먹어서 배탈이 났어요.",exf:"J'ai mal au ventre car j'ai mangé épicé.",ch:"Ch.7 Santé"},
+{t:"재채기",d:"L'éternuement",ex:"봄에 재채기가 나요.",exf:"J'éternue au printemps.",ch:"Ch.7 Santé"},
+{t:"콧물",d:"Nez qui coule",ex:"감기에 걸려서 콧물이 나와요.",exf:"J'ai le nez qui coule.",ch:"Ch.7 Santé"},
+{t:"열",d:"La fièvre",ex:"몸에서 열이 나요.",exf:"J'ai de la fièvre.",ch:"Ch.7 Santé"},
+{t:"치료",d:"Le traitement",ex:"의사 선생님이 치료해 주실 거예요.",exf:"Le médecin vous soignera.",ch:"Ch.7 Santé"},
+{t:"감기약",d:"Médicament contre le rhume",ex:"약국에서 감기약을 사요.",exf:"J'achète un médicament à la pharmacie.",ch:"Ch.7 Santé"},
+{t:"소화제",d:"Médicament digestif",ex:"소화가 안 돼서 소화제를 먹었어요.",exf:"J'ai pris un digestif.",ch:"Ch.7 Santé"},
+{t:"수술",d:"L'opération chirurgicale",ex:"빨리 수술하세요.",exf:"Faites-vous opérer vite.",ch:"Ch.7 Santé"},
+// Ch8 Cinéma
+{t:"예매",d:"Réservation (billets)",ex:"영화 표는 제가 예매할게요.",exf:"Je vais réserver les billets.",ch:"Ch.8 Cinéma"},
+{t:"시간표",d:"Horaire des séances",ex:"영화 시간표를 확인해 볼게요.",exf:"Je vais vérifier les horaires.",ch:"Ch.8 Cinéma"},
+{t:"자리",d:"La place / le siège",ex:"자리가 없어요.",exf:"Il n'y a pas de places.",ch:"Ch.8 Cinéma"},
+{t:"평일",d:"Jour de semaine",ex:"평일이라서 표가 많아요.",exf:"Il y a beaucoup de billets en semaine.",ch:"Ch.8 Cinéma"},
+{t:"휴일",d:"Jour de congé",ex:"휴일에 영화 볼까요?",exf:"On regarde un film le jour de congé ?",ch:"Ch.8 Cinéma"},
+{t:"무료",d:"Gratuit (formel)",ex:"한 명은 무료로 볼 수 있어요.",exf:"Une personne peut regarder gratuitement.",ch:"Ch.8 Cinéma"},
+{t:"무섭다",d:"Effrayant",ex:"이 영화는 정말 무서워요.",exf:"Ce film fait vraiment peur.",ch:"Ch.8 Cinéma"},
+{t:"지루하다",d:"Ennuyeux",ex:"영화가 좀 지루했어요.",exf:"Le film était un peu ennuyeux.",ch:"Ch.8 Cinéma"},
+{t:"팔리다",d:"Être vendu",ex:"표가 다 팔렸어요.",exf:"Tous les billets sont vendus.",ch:"Ch.8 Cinéma"},
+{t:"남다",d:"Rester (il reste qqch)",ex:"시간이 남았어요.",exf:"Il reste du temps.",ch:"Ch.8 Cinéma"},
+// Ch9 Loisirs
+{t:"낚시",d:"La pêche",ex:"주말에 낚시하러 갈 거예요.",exf:"Je vais pêcher ce week-end.",ch:"Ch.9 Loisirs"},
+{t:"경기",d:"Le match",ex:"운동 경기를 보러 갈래요?",exf:"On va voir un match ?",ch:"Ch.9 Loisirs"},
+{t:"소풍",d:"Le pique-nique",ex:"공원으로 소풍 갈래요?",exf:"On va pique-niquer au parc ?",ch:"Ch.9 Loisirs"},
+{t:"부지런하다",d:"Être diligent",ex:"정말 부지런하네요.",exf:"Vous êtes vraiment diligent.",ch:"Ch.9 Loisirs"},
+{t:"귀찮다",d:"Avoir la flemme",ex:"나가기 귀찮아요.",exf:"J'ai la flemme de sortir.",ch:"Ch.9 Loisirs"},
+{t:"가끔",d:"De temps en temps",ex:"가끔 한국 음식을 먹어요.",exf:"Je mange coréen de temps en temps.",ch:"Ch.9 Loisirs"},
+{t:"늘",d:"Toujours",ex:"늘 한국어 공부를 해요.",exf:"J'étudie toujours le coréen.",ch:"Ch.9 Loisirs"},
+{t:"거의",d:"Presque",ex:"거의 약속이 있어요.",exf:"J'ai presque toujours des plans.",ch:"Ch.9 Loisirs"},
+{t:"매주",d:"Chaque semaine",ex:"매주 친구를 만나요.",exf:"Je vois mon ami chaque semaine.",ch:"Ch.9 Loisirs"},
+// Ch10 Vie scolaire
+{t:"교환 학생",d:"Étudiant d'échange",ex:"교환 학생으로 한국에 가요.",exf:"Je pars en Corée comme étudiant d'échange.",ch:"Ch.10 Vie scolaire"},
+{t:"전공",d:"Spécialité / filière",ex:"전공이 뭐예요?",exf:"Quelle est votre spécialité ?",ch:"Ch.10 Vie scolaire"},
+{t:"대학원",d:"École doctorale",ex:"졸업 후에 대학원을 갈 거예요.",exf:"J'irai en école doctorale après le diplôme.",ch:"Ch.10 Vie scolaire"},
+{t:"학기",d:"Le semestre",ex:"새 학기를 시작했어요.",exf:"Le nouveau semestre a commencé.",ch:"Ch.10 Vie scolaire"},
+{t:"학년",d:"Année scolaire",ex:"벌써 2학년이 돼요.",exf:"Je passe en deuxième année.",ch:"Ch.10 Vie scolaire"},
+{t:"출석하다",d:"Assister au cours",ex:"날마다 수업에 출석해요.",exf:"J'assiste au cours tous les jours.",ch:"Ch.10 Vie scolaire"},
+{t:"결석하다",d:"Être absent",ex:"아파서 결석했어요.",exf:"J'étais absent car j'étais malade.",ch:"Ch.10 Vie scolaire"},
+{t:"지각",d:"Le retard",ex:"수업에 지각했어요.",exf:"J'étais en retard au cours.",ch:"Ch.10 Vie scolaire"},
+{t:"성적",d:"Les notes",ex:"좋은 성적을 받았어요.",exf:"J'ai eu de bonnes notes.",ch:"Ch.10 Vie scolaire"},
+{t:"규칙",d:"La règle",ex:"규칙을 지켜요.",exf:"On respecte les règles.",ch:"Ch.10 Vie scolaire"},
+{t:"안내문",d:"Guide / notice",ex:"학교생활 안내문을 받았어요.",exf:"J'ai reçu un guide scolaire.",ch:"Ch.10 Vie scolaire"},
+{t:"게시판",d:"Tableau d'affichage",ex:"학교 게시판을 봤어요.",exf:"J'ai consulté le tableau d'affichage.",ch:"Ch.10 Vie scolaire"},
+{t:"모임",d:"Rencontre / réunion",ex:"친구들과 모임이 있어요.",exf:"J'ai une rencontre avec des amis.",ch:"Ch.10 Vie scolaire"},
+// ---- 50 Essential Verbs ----
+{t:"하다",d:"faire",ex:"숙제를 해요.",exf:"Je fais mes devoirs.",ch:"Verbes essentiels"},
+{t:"되다",d:"devenir / fonctionner",ex:"의사가 되고 싶어요.",exf:"Je veux devenir médecin.",ch:"Verbes essentiels"},
+{t:"있다",d:"être (là) / avoir",ex:"시간이 있어요.",exf:"J'ai du temps.",ch:"Verbes essentiels"},
+{t:"없다",d:"ne pas avoir",ex:"돈이 없어요.",exf:"Je n'ai pas d'argent.",ch:"Verbes essentiels"},
+{t:"가다",d:"aller",ex:"학교에 가요.",exf:"Je vais à l'école.",ch:"Verbes essentiels"},
+{t:"오다",d:"venir",ex:"친구가 와요.",exf:"Un ami vient.",ch:"Verbes essentiels"},
+{t:"보다",d:"voir / regarder",ex:"영화를 봐요.",exf:"Je regarde un film.",ch:"Verbes essentiels"},
+{t:"먹다",d:"manger",ex:"밥을 먹어요.",exf:"Je mange.",ch:"Verbes essentiels"},
+{t:"마시다",d:"boire",ex:"물을 마셔요.",exf:"Je bois de l'eau.",ch:"Verbes essentiels"},
+{t:"자다",d:"dormir",ex:"일찍 자요.",exf:"Je me couche tôt.",ch:"Verbes essentiels"},
+{t:"일어나다",d:"se lever",ex:"아침 7시에 일어나요.",exf:"Je me lève à 7h.",ch:"Verbes essentiels"},
+{t:"앉다",d:"s'asseoir",ex:"여기 앉으세요.",exf:"Asseyez-vous ici.",ch:"Verbes essentiels"},
+{t:"서다",d:"se tenir debout",ex:"버스가 서요.",exf:"Le bus s'arrête.",ch:"Verbes essentiels"},
+{t:"주다",d:"donner",ex:"선물을 줘요.",exf:"Je donne un cadeau.",ch:"Verbes essentiels"},
+{t:"받다",d:"recevoir",ex:"편지를 받았어요.",exf:"J'ai reçu une lettre.",ch:"Verbes essentiels"},
+{t:"사다",d:"acheter",ex:"옷을 사요.",exf:"J'achète des vêtements.",ch:"Verbes essentiels"},
+{t:"팔다",d:"vendre",ex:"과일을 팔아요.",exf:"Je vends des fruits.",ch:"Verbes essentiels"},
+{t:"알다",d:"savoir / connaître",ex:"저는 그것을 알아요.",exf:"Je le sais.",ch:"Verbes essentiels"},
+{t:"모르다",d:"ne pas savoir (irrég.)",ex:"길을 몰라요.",exf:"Je ne connais pas le chemin.",ch:"Verbes essentiels"},
+{t:"말하다",d:"parler / dire",ex:"천천히 말해요.",exf:"Je parle lentement.",ch:"Verbes essentiels"},
+{t:"듣다",d:"écouter (ㄷ irrég.)",ex:"음악을 들어요.",exf:"J'écoute de la musique.",ch:"Verbes essentiels"},
+{t:"읽다",d:"lire",ex:"책을 읽어요.",exf:"Je lis un livre.",ch:"Verbes essentiels"},
+{t:"쓰다",d:"écrire (으 irrég.)",ex:"편지를 써요.",exf:"J'écris une lettre.",ch:"Verbes essentiels"},
+{t:"만나다",d:"rencontrer",ex:"친구를 만나요.",exf:"Je rencontre un ami.",ch:"Verbes essentiels"},
+{t:"만들다",d:"fabriquer / préparer",ex:"음식을 만들어요.",exf:"Je prépare à manger.",ch:"Verbes essentiels"},
+{t:"살다",d:"vivre / habiter",ex:"서울에 살아요.",exf:"J'habite à Séoul.",ch:"Verbes essentiels"},
+{t:"죽다",d:"mourir",ex:"꽃이 죽었어요.",exf:"La fleur est morte.",ch:"Verbes essentiels"},
+{t:"일하다",d:"travailler",ex:"회사에서 일해요.",exf:"Je travaille en entreprise.",ch:"Verbes essentiels"},
+{t:"공부하다",d:"étudier",ex:"한국어를 공부해요.",exf:"J'étudie le coréen.",ch:"Verbes essentiels"},
+{t:"놀다",d:"jouer / s'amuser",ex:"친구하고 놀아요.",exf:"Je m'amuse avec des amis.",ch:"Verbes essentiels"},
+{t:"좋아하다",d:"aimer / apprécier",ex:"커피를 좋아해요.",exf:"J'aime le café.",ch:"Verbes essentiels"},
+{t:"싫어하다",d:"détester",ex:"벌레를 싫어해요.",exf:"Je déteste les insectes.",ch:"Verbes essentiels"},
+{t:"사랑하다",d:"aimer (d'amour)",ex:"가족을 사랑해요.",exf:"J'aime ma famille.",ch:"Verbes essentiels"},
+{t:"원하다",d:"vouloir",ex:"무엇을 원해요?",exf:"Que voulez-vous ?",ch:"Verbes essentiels"},
+{t:"생각하다",d:"penser",ex:"가족을 생각해요.",exf:"Je pense à ma famille.",ch:"Verbes essentiels"},
+{t:"기다리다",d:"attendre",ex:"버스를 기다려요.",exf:"J'attends le bus.",ch:"Verbes essentiels"},
+{t:"찾다",d:"chercher / trouver",ex:"열쇠를 찾아요.",exf:"Je cherche mes clés.",ch:"Verbes essentiels"},
+{t:"열다",d:"ouvrir",ex:"창문을 열어요.",exf:"J'ouvre la fenêtre.",ch:"Verbes essentiels"},
+{t:"닫다",d:"fermer",ex:"문을 닫아요.",exf:"Je ferme la porte.",ch:"Verbes essentiels"},
+{t:"시작하다",d:"commencer",ex:"수업을 시작해요.",exf:"Le cours commence.",ch:"Verbes essentiels"},
+{t:"끝나다",d:"se terminer",ex:"수업이 끝났어요.",exf:"Le cours est fini.",ch:"Verbes essentiels"},
+{t:"배우다",d:"apprendre",ex:"요리를 배워요.",exf:"J'apprends à cuisiner.",ch:"Verbes essentiels"},
+{t:"가르치다",d:"enseigner",ex:"영어를 가르쳐요.",exf:"J'enseigne l'anglais.",ch:"Verbes essentiels"},
+{t:"웃다",d:"rire / sourire",ex:"크게 웃어요.",exf:"Je ris fort.",ch:"Verbes essentiels"},
+{t:"울다",d:"pleurer",ex:"아기가 울어요.",exf:"Le bébé pleure.",ch:"Verbes essentiels"},
+{t:"걷다",d:"marcher (ㄷ irrég.)",ex:"공원을 걸어요.",exf:"Je marche dans le parc.",ch:"Verbes essentiels"},
+{t:"뛰다",d:"courir",ex:"빨리 뛰어요.",exf:"Je cours vite.",ch:"Verbes essentiels"},
+{t:"타다",d:"prendre (transport)",ex:"버스를 타요.",exf:"Je prends le bus.",ch:"Verbes essentiels"},
+{t:"내리다",d:"descendre",ex:"여기에서 내려요.",exf:"Je descends ici.",ch:"Verbes essentiels"},
+{t:"입다",d:"porter (vêtement)",ex:"코트를 입어요.",exf:"Je mets un manteau.",ch:"Verbes essentiels"},
+];
+
+// ============ APP STATE ============
+let allCards = DATA.slice();
+let deck = [];
+let idx = 0;
+let flipped = false;
+let known = new Set();
+let wrong = new Set();
+let showingWrongOnly = false;
+
+// ---- Persistent mastery (survives across sessions) ----
+const STORE_KEY = "kf_mastered_v1";
+let mastered = new Set();
+function loadMastered(){
+  try{ const raw = localStorage.getItem(STORE_KEY); if(raw) mastered = new Set(JSON.parse(raw)); }
+  catch(e){ mastered = new Set(); }
+}
+function saveMastered(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify([...mastered])); }catch(e){}
+}
+loadMastered();
+
+// ============ FILTER BUTTONS ============
+const chapters = [...new Set(DATA.map(c=>c.ch))];
+let activeFilter = "Tout";
+
+function pctOf(ch){
+  const cards = (ch==="Tout") ? DATA : DATA.filter(c=>c.ch===ch);
+  const m = cards.filter(c=>mastered.has(c.t)).length;
+  return cards.length ? Math.round(m/cards.length*100) : 0;
+}
+function renderFilters(){
+  const el = document.getElementById("filters");
+  let html = `<button class="fbtn ${activeFilter==="Tout"?"active":""}" data-f="Tout">Tout (${DATA.length})<i class="fpct">${pctOf("Tout")}%</i></button>`;
+  for(const ch of chapters){
+    const n = DATA.filter(c=>c.ch===ch).length;
+    const short = ch.replace(/^Ch\.\d+\s*/,"").replace("Verbes essentiels","🔥 Verbes");
+    html += `<button class="fbtn ${activeFilter===ch?"active":""}" data-f="${ch}">${short} (${n})<i class="fpct">${pctOf(ch)}%</i></button>`;
+  }
+  el.innerHTML = html;
+  el.querySelectorAll(".fbtn").forEach(b=>b.onclick=()=>{
+    activeFilter = b.dataset.f;
+    showingWrongOnly = false;
+    document.getElementById("bOnlyWrong").classList.remove("active-mode");
+    buildDeck();
+    renderFilters();
+  });
+}
+
+// ============ DECK ============
+function buildDeck(){
+  if(activeFilter==="Tout") deck = allCards.slice();
+  else deck = allCards.filter(c=>c.ch===activeFilter);
+  known = new Set();
+  wrong = new Set();
+  idx = 0;
+  flipped = false;
+  render();
+}
+
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
+
+// ============ RENDER ============
+function render(){
+  const area = document.getElementById("cardArea");
+  const total = deck.length;
+  document.getElementById("topcount").textContent = `${total} cartes`;
+  // progress bar = % MAÎTRISÉ de la section courante (persistant dans le temps)
+  const secCards = (activeFilter==="Tout") ? allCards : allCards.filter(c=>c.ch===activeFilter);
+  const secMastered = secCards.filter(c=>mastered.has(c.t)).length;
+  const pct = secCards.length ? Math.round(secMastered/secCards.length*100) : 0;
+  document.getElementById("pfill").style.width = pct+"%";
+  document.getElementById("plabel").textContent = `${pct}% appris (${secMastered}/${secCards.length})`;
+
+  if(idx >= deck.length){
+    // done
+    area.innerHTML = `<div class="done">
+      <h2>🎉 Terminé !</h2>
+      <p>✅ Connues : ${known.size} &nbsp;·&nbsp; ❌ À revoir : ${wrong.size}</p>
+      ${wrong.size ? `<button onclick="reviewWrong()">Revoir les ${wrong.size} ratées</button>` : `<button onclick="buildDeck()">Recommencer</button>`}
+    </div>`;
+    document.getElementById("controls").style.visibility="hidden";
+    return;
+  }
+  document.getElementById("controls").style.visibility="visible";
+  const c = deck[idx];
+  area.innerHTML = `
+    <div class="perspective" id="cardFlip" onclick="flipCard()">
+      <div class="flipper ${flipped?'flipped':''}" id="flipper">
+        <div class="face front">
+          <span class="front-chap">${esc(c.ch)}</span>
+          <span class="front-num">${idx+1}/${total}</span>
+          ${mastered.has(c.t)?'<span class="mastered-badge">✓ appris</span>':''}
+          <div class="front-kr kr">${esc(c.t)}</div>
+          <div class="front-hint">Clique pour retourner</div>
+        </div>
+        <div class="face back">
+          <div class="back-fr">${esc(c.d)}</div>
+          <div class="back-ex"><b class="kr">${esc(c.ex)}</b><br>${esc(c.exf)}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+
+function flipCard(){
+  flipped = !flipped;
+  const f = document.getElementById("flipper");
+  if(f) f.classList.toggle("flipped", flipped);
+}
+
+function next(){
+  if(idx < deck.length) { idx++; flipped=false; render(); }
+}
+function prev(){
+  if(idx > 0) { idx--; flipped=false; known.delete(idx); wrong.delete(idx); render(); }
+}
+function markKnow(){
+  const c = deck[idx];
+  if(c){ mastered.add(c.t); saveMastered(); }
+  known.add(idx); wrong.delete(idx);
+  renderFilters();
+  next();
+}
+function markDontKnow(){
+  const c = deck[idx];
+  if(c){ mastered.delete(c.t); saveMastered(); }
+  wrong.add(idx); known.delete(idx);
+  renderFilters();
+  next();
+}
+function reviewWrong(){
+  const wrongCards = [...wrong].map(i=>deck[i]);
+  deck = wrongCards;
+  idx=0; flipped=false; known=new Set(); wrong=new Set();
+  showingWrongOnly=true;
+  document.getElementById("bOnlyWrong").classList.add("active-mode");
+  render();
+}
+
+// ============ CONTROLS ============
+document.getElementById("bFlip").onclick = flipCard;
+document.getElementById("bNext").onclick = next;
+document.getElementById("bPrev").onclick = prev;
+document.getElementById("bKnow").onclick = markKnow;
+document.getElementById("bDontKnow").onclick = markDontKnow;
+document.getElementById("bShuffle").onclick = ()=>{ shuffle(deck); idx=0; flipped=false; known=new Set(); wrong=new Set(); render(); };
+document.getElementById("bReset").onclick = ()=>{ showingWrongOnly=false; document.getElementById("bOnlyWrong").classList.remove("active-mode"); buildDeck(); };
+document.getElementById("bOnlyWrong").onclick = reviewWrong;
+
+// ============ PROGRESSION PANEL ============
+function renderProgress(){
+  const overall = pctOf("Tout");
+  const totMastered = DATA.filter(c=>mastered.has(c.t)).length;
+  document.getElementById("panelOverall").innerHTML =
+    `<div class="ov-ring" style="--p:${overall}"><span>${overall}%</span></div>
+     <div class="ov-txt"><b>${totMastered} / ${DATA.length}</b> cartes maîtrisées<br><small>Continue, chaque carte compte !</small></div>`;
+  let rows = "";
+  for(const ch of chapters){
+    const cards = DATA.filter(c=>c.ch===ch);
+    const m = cards.filter(c=>mastered.has(c.t)).length;
+    const p = Math.round(m/cards.length*100);
+    const short = ch.replace("Verbes essentiels","🔥 Verbes essentiels");
+    rows += `<div class="prow">
+      <div class="prow-top"><span class="prow-name">${short}</span><span class="prow-pct">${p}% <small>(${m}/${cards.length})</small></span></div>
+      <div class="prow-bar"><div class="prow-fill" style="width:${p}%"></div></div>
+    </div>`;
+  }
+  document.getElementById("panelList").innerHTML = rows;
+}
+function openProgress(){ renderProgress(); document.getElementById("overlay").classList.add("show"); }
+function closeProgress(){ document.getElementById("overlay").classList.remove("show"); }
+document.getElementById("bProgress").onclick = openProgress;
+document.getElementById("panelClose").onclick = closeProgress;
+document.getElementById("overlay").onclick = (e)=>{ if(e.target.id==="overlay") closeProgress(); };
+document.getElementById("panelReset").onclick = ()=>{
+  if(confirm("Effacer toute ta progression ? Cette action est irréversible.")){
+    mastered = new Set(); saveMastered(); renderProgress(); renderFilters(); render();
+  }
+};
+
+// Keyboard
+document.addEventListener("keydown", e=>{
+  if(e.key===" "||e.key==="Enter"){e.preventDefault();flipCard();}
+  if(e.key==="ArrowRight") next();
+  if(e.key==="ArrowLeft") prev();
+  if(e.key==="ArrowDown"){e.preventDefault();markKnow();}
+  if(e.key==="ArrowUp"){e.preventDefault();markDontKnow();}
+});
+
+// ============ INIT ============
+renderFilters();
+buildDeck();
+</script>
+</body>
+</html>
