@@ -91,6 +91,7 @@ body{
   background:radial-gradient(120% 90% at 80% 0%, rgba(255,255,255,.18), transparent 55%);
   pointer-events:none;
 }
+.back-emoji{font-size:clamp(3rem,13vw,4.6rem);line-height:1;margin-bottom:16px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.22))}
 .front-kr{font-family:"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",sans-serif;font-weight:800;font-size:clamp(2rem,7vw,2.9rem);line-height:1.12;color:var(--ink);letter-spacing:-.01em}
 .front-hint{margin-top:14px;font-size:.72rem;color:var(--muted);font-weight:600;opacity:.85;display:inline-flex;align-items:center;gap:5px}
 .front-hint::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--indigo);display:inline-block}
@@ -232,7 +233,7 @@ body{
   <button class="bbtn" id="bProgress"><span class="bico">📈</span>Progression</button>
   <button class="bbtn" id="bShuffle"><span class="bico">🎲</span>Mélanger</button>
   <button class="bbtn" id="bReset"><span class="bico">♻️</span>Recommencer</button>
-  <button class="bbtn" id="bOnlyWrong"><span class="bico">🎯</span>Ratées</button>
+  <button class="bbtn" id="bOnlyWrong"><span class="bico">🎯</span><span id="wrongLabel">Ratées</span></button>
 </div>
 
 <div class="spacer"></div>
@@ -252,173 +253,362 @@ body{
 <script>
 // ============ CARD DATA ============
 const DATA=[
-// Ch1 Météo
-{t:"기온이 높다",d:"Les températures sont élevées",ex:"기온이 높아서 날씨가 더워요.",exf:"Il fait chaud car les températures sont élevées.",ch:"Ch.1 Météo"},
-{t:"기온이 낮다",d:"Les températures sont basses",ex:"기온이 낮아서 날씨가 추워요.",exf:"Il fait froid car les températures sont basses.",ch:"Ch.1 Météo"},
-{t:"장마",d:"La saison des pluies",ex:"장마가 와요.",exf:"La saison des pluies arrive.",ch:"Ch.1 Météo"},
-{t:"태풍",d:"Le typhon",ex:"태풍이 와요. 바람이 강하게 불어요.",exf:"Le typhon approche. Le vent souffle fort.",ch:"Ch.1 Météo"},
-{t:"사계절",d:"Les quatre saisons",ex:"한국에는 사계절이 있어요.",exf:"Il y a quatre saisons en Corée.",ch:"Ch.1 Météo"},
-{t:"햇빛",d:"La lumière du soleil",ex:"햇빛이 강해요.",exf:"La lumière du soleil est forte.",ch:"Ch.1 Météo"},
-{t:"선선하다",d:"Être frais (agréable)",ex:"가을이 되니까 날씨가 선선해요.",exf:"Le temps est frais car c'est l'automne.",ch:"Ch.1 Météo"},
-{t:"쌀쌀하다",d:"Être froid (désagréable)",ex:"날씨가 쌀쌀해요.",exf:"Il fait froid.",ch:"Ch.1 Météo"},
-{t:"구름이 끼다",d:"Être nuageux",ex:"구름이 껴서 해가 보이지 않아요.",exf:"Il est nuageux, on ne voit pas le soleil.",ch:"Ch.1 Météo"},
-{t:"안개가 끼다",d:"Avoir du brouillard",ex:"안개가 껴서 운전할 수 없어요.",exf:"Il y a du brouillard, je ne peux pas conduire.",ch:"Ch.1 Météo"},
-{t:"바람이 불다",d:"Le vent souffle",ex:"바람이 많이 불어서 추워요.",exf:"Il fait froid car il y a beaucoup de vent.",ch:"Ch.1 Météo"},
-{t:"비가 그치다",d:"La pluie s'arrête",ex:"비가 그쳐서 우산을 쓰지 않아요.",exf:"La pluie s'est arrêtée.",ch:"Ch.1 Météo"},
-{t:"날씨가 좋다/나쁘다",d:"Il fait beau / mauvais",ex:"오늘은 날씨가 좋아요.",exf:"Il fait beau aujourd'hui.",ch:"Ch.1 Météo"},
-{t:"비가 오다/내리다",d:"Pleuvoir",ex:"비가 오니까 우산을 쓰세요.",exf:"Il pleut, prenez un parapluie.",ch:"Ch.1 Météo"},
-{t:"계절이 바뀌다",d:"La saison change",ex:"계절이 바뀌고 있어요.",exf:"La saison change.",ch:"Ch.1 Météo"},
-// Ch2 Shopping
-{t:"명동",d:"Myeong-dong (cosmétiques)",ex:"명동에는 화장품 가게가 많이 있어요.",exf:"Il y a beaucoup de boutiques de cosmétiques.",ch:"Ch.2 Shopping"},
-{t:"동대문",d:"Dongdaemun (vêtements)",ex:"동대문에는 옷 가게가 많이 있어요.",exf:"Il y a beaucoup de magasins de vêtements.",ch:"Ch.2 Shopping"},
-{t:"시장",d:"Le marché",ex:"시장에서 옷을 사요.",exf:"J'achète des vêtements au marché.",ch:"Ch.2 Shopping"},
-{t:"카페",d:"Le café",ex:"카페에서 친구를 만나요.",exf:"Je rencontre un ami dans un café.",ch:"Ch.2 Shopping"},
-{t:"더럽다",d:"Être sale",ex:"거리가 더러워요.",exf:"La rue est sale.",ch:"Ch.2 Shopping"},
-{t:"깨끗하다",d:"Être propre",ex:"거리가 깨끗해요.",exf:"La rue est propre.",ch:"Ch.2 Shopping"},
-{t:"복잡하다",d:"Être bondé / compliqué",ex:"길이 복잡해요.",exf:"La rue est bondée.",ch:"Ch.2 Shopping"},
-{t:"시끄럽다",d:"Être bruyant",ex:"그곳은 너무 시끄러워요.",exf:"C'est trop bruyant là-bas.",ch:"Ch.2 Shopping"},
-{t:"그러면",d:"Alors, dans ce cas",ex:"그러면 비빔밥은 어때요?",exf:"Alors, et le bibimbap ?",ch:"Ch.2 Shopping"},
-{t:"알겠어요",d:"D'accord / compris",ex:"알겠어요. 같이 청소해요.",exf:"D'accord. Nettoyons ensemble.",ch:"Ch.2 Shopping"},
-// Ch3 Apparence
-{t:"멋있다",d:"Être beau / cool",ex:"제 남자친구는 아주 멋있어요.",exf:"Mon petit ami est très beau.",ch:"Ch.3 Apparence"},
-{t:"귀엽다",d:"Être mignon",ex:"제 동생은 정말 귀여워요.",exf:"Mon petit frère est mignon.",ch:"Ch.3 Apparence"},
-{t:"얼굴",d:"Le visage",ex:"그 사람의 얼굴을 알아요?",exf:"Connaissez-vous son visage ?",ch:"Ch.3 Apparence"},
-{t:"까만색",d:"Noir",ex:"까만색 바지를 입고 있어요.",exf:"Je porte un pantalon noir.",ch:"Ch.3 Apparence"},
-{t:"빨간색",d:"Rouge",ex:"제 가방은 빨간색이에요.",exf:"Mon sac est rouge.",ch:"Ch.3 Apparence"},
-{t:"하얀색",d:"Blanc",ex:"하얀색 모자를 좋아해요.",exf:"Il aime les chapeaux blancs.",ch:"Ch.3 Apparence"},
-{t:"파란색",d:"Bleu",ex:"파란색 티셔츠를 자주 입어요.",exf:"Il porte souvent un T-shirt bleu.",ch:"Ch.3 Apparence"},
-// Ch4 Courses
-{t:"마트",d:"Le supermarché",ex:"마트에서 장을 봐요.",exf:"Je fais les courses au supermarché.",ch:"Ch.4 Courses"},
-{t:"공짜",d:"Gratuit (familier)",ex:"하나는 공짜예요.",exf:"Un est gratuit.",ch:"Ch.4 Courses"},
-{t:"할인",d:"Rabais / réduction",ex:"할인 받을 수 있어요?",exf:"Puis-je avoir une remise ?",ch:"Ch.4 Courses"},
-{t:"고추장",d:"Gochujang (pâte de piment)",ex:"떡볶이에는 고추장이 필요해요.",exf:"Le tteokbokki nécessite du gochujang.",ch:"Ch.4 Courses"},
-{t:"된장",d:"Doenjang (pâte de soja)",ex:"된장찌개에는 된장이 필요해요.",exf:"Le doenjang-jjigae nécessite du doenjang.",ch:"Ch.4 Courses"},
-{t:"간장",d:"Sauce soja",ex:"간장을 많이 넣어서 짜요.",exf:"C'est salé car j'ai mis beaucoup de sauce soja.",ch:"Ch.4 Courses"},
-{t:"소고기",d:"Le bœuf",ex:"소고기로 불고기를 해 먹어요.",exf:"On fait du bulgogi au bœuf.",ch:"Ch.4 Courses"},
-{t:"돼지고기",d:"Le porc",ex:"삼겹살을 좋아해요.",exf:"J'aime le samgyeopsal.",ch:"Ch.4 Courses"},
-{t:"닭고기",d:"Le poulet",ex:"닭고기를 튀겨서 치킨을 만들어요.",exf:"On frit le poulet pour faire du poulet frit.",ch:"Ch.4 Courses"},
-{t:"야채",d:"Le légume",ex:"고기와 야채를 같이 먹어야 해요.",exf:"Il faut manger viande et légumes.",ch:"Ch.4 Courses"},
-{t:"쌀",d:"Le riz (cru)",ex:"쌀을 씻어서 밥을 지어요.",exf:"Lavez le riz et faites-le cuire.",ch:"Ch.4 Courses"},
-{t:"밀가루",d:"La farine",ex:"빵을 만들 거예요. 밀가루가 필요해요.",exf:"Je vais faire du pain. J'ai besoin de farine.",ch:"Ch.4 Courses"},
-// Ch5 Commande
-{t:"예약",d:"La réservation",ex:"이 메뉴는 예약하셔야 돼요.",exf:"Vous devez réserver pour ce menu.",ch:"Ch.5 Commande"},
-{t:"주문",d:"La commande",ex:"저희 주문할게요.",exf:"Nous aimerions commander.",ch:"Ch.5 Commande"},
-{t:"취소",d:"L'annulation",ex:"메뉴 하나는 취소하고 싶어요.",exf:"Je voudrais annuler un plat.",ch:"Ch.5 Commande"},
-{t:"포장",d:"À emporter",ex:"이 음식을 포장해 주세요.",exf:"Ce plat à emporter, s'il vous plaît.",ch:"Ch.5 Commande"},
-{t:"접시",d:"L'assiette",ex:"이 접시에 음식을 담으세요.",exf:"Mettez la nourriture dans cette assiette.",ch:"Ch.5 Commande"},
-{t:"숟가락",d:"La cuillère",ex:"숟가락 좀 바꿔 주세요.",exf:"Changez-moi la cuillère.",ch:"Ch.5 Commande"},
-{t:"젓가락",d:"Les baguettes",ex:"젓가락으로 자장면을 먹어요.",exf:"Je mange avec des baguettes.",ch:"Ch.5 Commande"},
-{t:"수저",d:"Cuillère + baguettes",ex:"여기 수저 좀 주세요.",exf:"Donnez-moi des couverts.",ch:"Ch.5 Commande"},
-{t:"계산",d:"L'addition / paiement",ex:"계산을 할까요?",exf:"On paie ?",ch:"Ch.5 Commande"},
-{t:"영수증",d:"Le reçu",ex:"영수증을 드릴까요?",exf:"Souhaitez-vous un reçu ?",ch:"Ch.5 Commande"},
-// Ch6 Vacances
-{t:"하루",d:"Un jour / une journée",ex:"하루 동안 방을 청소해요.",exf:"Je nettoie ma chambre pendant une journée.",ch:"Ch.6 Vacances"},
-{t:"이틀",d:"Deux jours",ex:"이틀 동안 수영을 배워요.",exf:"J'apprends à nager pendant deux jours.",ch:"Ch.6 Vacances"},
-{t:"사흘",d:"Trois jours",ex:"사흘 동안 시험을 봐요.",exf:"Je passe un examen pendant trois jours.",ch:"Ch.6 Vacances"},
-{t:"해외여행",d:"Voyage à l'étranger",ex:"해외여행을 갈 거예요.",exf:"Je pars à l'étranger.",ch:"Ch.6 Vacances"},
-{t:"항공권",d:"Billet d'avion",ex:"항공권을 싸게 샀어요.",exf:"J'ai acheté mon billet d'avion à bas prix.",ch:"Ch.6 Vacances"},
-{t:"기차표",d:"Billet de train",ex:"기차표를 샀어요.",exf:"J'ai acheté un billet de train.",ch:"Ch.6 Vacances"},
-{t:"경치",d:"Le paysage",ex:"경치가 아름다워요.",exf:"Le paysage est magnifique.",ch:"Ch.6 Vacances"},
-{t:"관광",d:"Le tourisme",ex:"거기에 가서 관광을 할 거예요.",exf:"Je vais y faire du tourisme.",ch:"Ch.6 Vacances"},
-// Ch7 Santé
-{t:"내과",d:"Médecine interne",ex:"배가 아파서 내과에 가요.",exf:"J'ai mal au ventre, je vais en médecine interne.",ch:"Ch.7 Santé"},
-{t:"치과",d:"Le dentiste",ex:"이를 뽑으러 치과에 가요.",exf:"Je vais chez le dentiste.",ch:"Ch.7 Santé"},
-{t:"기침",d:"La toux",ex:"감기에 걸려서 기침이 나요.",exf:"Je tousse car j'ai un rhume.",ch:"Ch.7 Santé"},
-{t:"두통",d:"Le mal de tête",ex:"스트레스를 받아서 두통이 생겼어요.",exf:"J'ai mal à la tête à cause du stress.",ch:"Ch.7 Santé"},
-{t:"배탈",d:"Maux d'estomac",ex:"매운 음식을 먹어서 배탈이 났어요.",exf:"J'ai mal au ventre car j'ai mangé épicé.",ch:"Ch.7 Santé"},
-{t:"재채기",d:"L'éternuement",ex:"봄에 재채기가 나요.",exf:"J'éternue au printemps.",ch:"Ch.7 Santé"},
-{t:"콧물",d:"Nez qui coule",ex:"감기에 걸려서 콧물이 나와요.",exf:"J'ai le nez qui coule.",ch:"Ch.7 Santé"},
-{t:"열",d:"La fièvre",ex:"몸에서 열이 나요.",exf:"J'ai de la fièvre.",ch:"Ch.7 Santé"},
-{t:"치료",d:"Le traitement",ex:"의사 선생님이 치료해 주실 거예요.",exf:"Le médecin vous soignera.",ch:"Ch.7 Santé"},
-{t:"감기약",d:"Médicament contre le rhume",ex:"약국에서 감기약을 사요.",exf:"J'achète un médicament à la pharmacie.",ch:"Ch.7 Santé"},
-{t:"소화제",d:"Médicament digestif",ex:"소화가 안 돼서 소화제를 먹었어요.",exf:"J'ai pris un digestif.",ch:"Ch.7 Santé"},
-{t:"수술",d:"L'opération chirurgicale",ex:"빨리 수술하세요.",exf:"Faites-vous opérer vite.",ch:"Ch.7 Santé"},
-// Ch8 Cinéma
-{t:"예매",d:"Réservation (billets)",ex:"영화 표는 제가 예매할게요.",exf:"Je vais réserver les billets.",ch:"Ch.8 Cinéma"},
-{t:"시간표",d:"Horaire des séances",ex:"영화 시간표를 확인해 볼게요.",exf:"Je vais vérifier les horaires.",ch:"Ch.8 Cinéma"},
-{t:"자리",d:"La place / le siège",ex:"자리가 없어요.",exf:"Il n'y a pas de places.",ch:"Ch.8 Cinéma"},
-{t:"평일",d:"Jour de semaine",ex:"평일이라서 표가 많아요.",exf:"Il y a beaucoup de billets en semaine.",ch:"Ch.8 Cinéma"},
-{t:"휴일",d:"Jour de congé",ex:"휴일에 영화 볼까요?",exf:"On regarde un film le jour de congé ?",ch:"Ch.8 Cinéma"},
-{t:"무료",d:"Gratuit (formel)",ex:"한 명은 무료로 볼 수 있어요.",exf:"Une personne peut regarder gratuitement.",ch:"Ch.8 Cinéma"},
-{t:"무섭다",d:"Effrayant",ex:"이 영화는 정말 무서워요.",exf:"Ce film fait vraiment peur.",ch:"Ch.8 Cinéma"},
-{t:"지루하다",d:"Ennuyeux",ex:"영화가 좀 지루했어요.",exf:"Le film était un peu ennuyeux.",ch:"Ch.8 Cinéma"},
-{t:"팔리다",d:"Être vendu",ex:"표가 다 팔렸어요.",exf:"Tous les billets sont vendus.",ch:"Ch.8 Cinéma"},
-{t:"남다",d:"Rester (il reste qqch)",ex:"시간이 남았어요.",exf:"Il reste du temps.",ch:"Ch.8 Cinéma"},
-// Ch9 Loisirs
-{t:"낚시",d:"La pêche",ex:"주말에 낚시하러 갈 거예요.",exf:"Je vais pêcher ce week-end.",ch:"Ch.9 Loisirs"},
-{t:"경기",d:"Le match",ex:"운동 경기를 보러 갈래요?",exf:"On va voir un match ?",ch:"Ch.9 Loisirs"},
-{t:"소풍",d:"Le pique-nique",ex:"공원으로 소풍 갈래요?",exf:"On va pique-niquer au parc ?",ch:"Ch.9 Loisirs"},
-{t:"부지런하다",d:"Être diligent",ex:"정말 부지런하네요.",exf:"Vous êtes vraiment diligent.",ch:"Ch.9 Loisirs"},
-{t:"귀찮다",d:"Avoir la flemme",ex:"나가기 귀찮아요.",exf:"J'ai la flemme de sortir.",ch:"Ch.9 Loisirs"},
-{t:"가끔",d:"De temps en temps",ex:"가끔 한국 음식을 먹어요.",exf:"Je mange coréen de temps en temps.",ch:"Ch.9 Loisirs"},
-{t:"늘",d:"Toujours",ex:"늘 한국어 공부를 해요.",exf:"J'étudie toujours le coréen.",ch:"Ch.9 Loisirs"},
-{t:"거의",d:"Presque",ex:"거의 약속이 있어요.",exf:"J'ai presque toujours des plans.",ch:"Ch.9 Loisirs"},
-{t:"매주",d:"Chaque semaine",ex:"매주 친구를 만나요.",exf:"Je vois mon ami chaque semaine.",ch:"Ch.9 Loisirs"},
-// Ch10 Vie scolaire
-{t:"교환 학생",d:"Étudiant d'échange",ex:"교환 학생으로 한국에 가요.",exf:"Je pars en Corée comme étudiant d'échange.",ch:"Ch.10 Vie scolaire"},
-{t:"전공",d:"Spécialité / filière",ex:"전공이 뭐예요?",exf:"Quelle est votre spécialité ?",ch:"Ch.10 Vie scolaire"},
-{t:"대학원",d:"École doctorale",ex:"졸업 후에 대학원을 갈 거예요.",exf:"J'irai en école doctorale après le diplôme.",ch:"Ch.10 Vie scolaire"},
-{t:"학기",d:"Le semestre",ex:"새 학기를 시작했어요.",exf:"Le nouveau semestre a commencé.",ch:"Ch.10 Vie scolaire"},
-{t:"학년",d:"Année scolaire",ex:"벌써 2학년이 돼요.",exf:"Je passe en deuxième année.",ch:"Ch.10 Vie scolaire"},
-{t:"출석하다",d:"Assister au cours",ex:"날마다 수업에 출석해요.",exf:"J'assiste au cours tous les jours.",ch:"Ch.10 Vie scolaire"},
-{t:"결석하다",d:"Être absent",ex:"아파서 결석했어요.",exf:"J'étais absent car j'étais malade.",ch:"Ch.10 Vie scolaire"},
-{t:"지각",d:"Le retard",ex:"수업에 지각했어요.",exf:"J'étais en retard au cours.",ch:"Ch.10 Vie scolaire"},
-{t:"성적",d:"Les notes",ex:"좋은 성적을 받았어요.",exf:"J'ai eu de bonnes notes.",ch:"Ch.10 Vie scolaire"},
-{t:"규칙",d:"La règle",ex:"규칙을 지켜요.",exf:"On respecte les règles.",ch:"Ch.10 Vie scolaire"},
-{t:"안내문",d:"Guide / notice",ex:"학교생활 안내문을 받았어요.",exf:"J'ai reçu un guide scolaire.",ch:"Ch.10 Vie scolaire"},
-{t:"게시판",d:"Tableau d'affichage",ex:"학교 게시판을 봤어요.",exf:"J'ai consulté le tableau d'affichage.",ch:"Ch.10 Vie scolaire"},
-{t:"모임",d:"Rencontre / réunion",ex:"친구들과 모임이 있어요.",exf:"J'ai une rencontre avec des amis.",ch:"Ch.10 Vie scolaire"},
-// ---- 50 Essential Verbs ----
-{t:"하다",d:"faire",ex:"숙제를 해요.",exf:"Je fais mes devoirs.",ch:"Verbes essentiels"},
-{t:"되다",d:"devenir / fonctionner",ex:"의사가 되고 싶어요.",exf:"Je veux devenir médecin.",ch:"Verbes essentiels"},
-{t:"있다",d:"être (là) / avoir",ex:"시간이 있어요.",exf:"J'ai du temps.",ch:"Verbes essentiels"},
-{t:"없다",d:"ne pas avoir",ex:"돈이 없어요.",exf:"Je n'ai pas d'argent.",ch:"Verbes essentiels"},
-{t:"가다",d:"aller",ex:"학교에 가요.",exf:"Je vais à l'école.",ch:"Verbes essentiels"},
-{t:"오다",d:"venir",ex:"친구가 와요.",exf:"Un ami vient.",ch:"Verbes essentiels"},
-{t:"보다",d:"voir / regarder",ex:"영화를 봐요.",exf:"Je regarde un film.",ch:"Verbes essentiels"},
-{t:"먹다",d:"manger",ex:"밥을 먹어요.",exf:"Je mange.",ch:"Verbes essentiels"},
-{t:"마시다",d:"boire",ex:"물을 마셔요.",exf:"Je bois de l'eau.",ch:"Verbes essentiels"},
-{t:"자다",d:"dormir",ex:"일찍 자요.",exf:"Je me couche tôt.",ch:"Verbes essentiels"},
-{t:"일어나다",d:"se lever",ex:"아침 7시에 일어나요.",exf:"Je me lève à 7h.",ch:"Verbes essentiels"},
-{t:"앉다",d:"s'asseoir",ex:"여기 앉으세요.",exf:"Asseyez-vous ici.",ch:"Verbes essentiels"},
-{t:"서다",d:"se tenir debout",ex:"버스가 서요.",exf:"Le bus s'arrête.",ch:"Verbes essentiels"},
-{t:"주다",d:"donner",ex:"선물을 줘요.",exf:"Je donne un cadeau.",ch:"Verbes essentiels"},
-{t:"받다",d:"recevoir",ex:"편지를 받았어요.",exf:"J'ai reçu une lettre.",ch:"Verbes essentiels"},
-{t:"사다",d:"acheter",ex:"옷을 사요.",exf:"J'achète des vêtements.",ch:"Verbes essentiels"},
-{t:"팔다",d:"vendre",ex:"과일을 팔아요.",exf:"Je vends des fruits.",ch:"Verbes essentiels"},
-{t:"알다",d:"savoir / connaître",ex:"저는 그것을 알아요.",exf:"Je le sais.",ch:"Verbes essentiels"},
-{t:"모르다",d:"ne pas savoir (irrég.)",ex:"길을 몰라요.",exf:"Je ne connais pas le chemin.",ch:"Verbes essentiels"},
-{t:"말하다",d:"parler / dire",ex:"천천히 말해요.",exf:"Je parle lentement.",ch:"Verbes essentiels"},
-{t:"듣다",d:"écouter (ㄷ irrég.)",ex:"음악을 들어요.",exf:"J'écoute de la musique.",ch:"Verbes essentiels"},
-{t:"읽다",d:"lire",ex:"책을 읽어요.",exf:"Je lis un livre.",ch:"Verbes essentiels"},
-{t:"쓰다",d:"écrire (으 irrég.)",ex:"편지를 써요.",exf:"J'écris une lettre.",ch:"Verbes essentiels"},
-{t:"만나다",d:"rencontrer",ex:"친구를 만나요.",exf:"Je rencontre un ami.",ch:"Verbes essentiels"},
-{t:"만들다",d:"fabriquer / préparer",ex:"음식을 만들어요.",exf:"Je prépare à manger.",ch:"Verbes essentiels"},
-{t:"살다",d:"vivre / habiter",ex:"서울에 살아요.",exf:"J'habite à Séoul.",ch:"Verbes essentiels"},
-{t:"죽다",d:"mourir",ex:"꽃이 죽었어요.",exf:"La fleur est morte.",ch:"Verbes essentiels"},
-{t:"일하다",d:"travailler",ex:"회사에서 일해요.",exf:"Je travaille en entreprise.",ch:"Verbes essentiels"},
-{t:"공부하다",d:"étudier",ex:"한국어를 공부해요.",exf:"J'étudie le coréen.",ch:"Verbes essentiels"},
-{t:"놀다",d:"jouer / s'amuser",ex:"친구하고 놀아요.",exf:"Je m'amuse avec des amis.",ch:"Verbes essentiels"},
-{t:"좋아하다",d:"aimer / apprécier",ex:"커피를 좋아해요.",exf:"J'aime le café.",ch:"Verbes essentiels"},
-{t:"싫어하다",d:"détester",ex:"벌레를 싫어해요.",exf:"Je déteste les insectes.",ch:"Verbes essentiels"},
-{t:"사랑하다",d:"aimer (d'amour)",ex:"가족을 사랑해요.",exf:"J'aime ma famille.",ch:"Verbes essentiels"},
-{t:"원하다",d:"vouloir",ex:"무엇을 원해요?",exf:"Que voulez-vous ?",ch:"Verbes essentiels"},
-{t:"생각하다",d:"penser",ex:"가족을 생각해요.",exf:"Je pense à ma famille.",ch:"Verbes essentiels"},
-{t:"기다리다",d:"attendre",ex:"버스를 기다려요.",exf:"J'attends le bus.",ch:"Verbes essentiels"},
-{t:"찾다",d:"chercher / trouver",ex:"열쇠를 찾아요.",exf:"Je cherche mes clés.",ch:"Verbes essentiels"},
-{t:"열다",d:"ouvrir",ex:"창문을 열어요.",exf:"J'ouvre la fenêtre.",ch:"Verbes essentiels"},
-{t:"닫다",d:"fermer",ex:"문을 닫아요.",exf:"Je ferme la porte.",ch:"Verbes essentiels"},
-{t:"시작하다",d:"commencer",ex:"수업을 시작해요.",exf:"Le cours commence.",ch:"Verbes essentiels"},
-{t:"끝나다",d:"se terminer",ex:"수업이 끝났어요.",exf:"Le cours est fini.",ch:"Verbes essentiels"},
-{t:"배우다",d:"apprendre",ex:"요리를 배워요.",exf:"J'apprends à cuisiner.",ch:"Verbes essentiels"},
-{t:"가르치다",d:"enseigner",ex:"영어를 가르쳐요.",exf:"J'enseigne l'anglais.",ch:"Verbes essentiels"},
-{t:"웃다",d:"rire / sourire",ex:"크게 웃어요.",exf:"Je ris fort.",ch:"Verbes essentiels"},
-{t:"울다",d:"pleurer",ex:"아기가 울어요.",exf:"Le bébé pleure.",ch:"Verbes essentiels"},
-{t:"걷다",d:"marcher (ㄷ irrég.)",ex:"공원을 걸어요.",exf:"Je marche dans le parc.",ch:"Verbes essentiels"},
-{t:"뛰다",d:"courir",ex:"빨리 뛰어요.",exf:"Je cours vite.",ch:"Verbes essentiels"},
-{t:"타다",d:"prendre (transport)",ex:"버스를 타요.",exf:"Je prends le bus.",ch:"Verbes essentiels"},
-{t:"내리다",d:"descendre",ex:"여기에서 내려요.",exf:"Je descends ici.",ch:"Verbes essentiels"},
-{t:"입다",d:"porter (vêtement)",ex:"코트를 입어요.",exf:"Je mets un manteau.",ch:"Verbes essentiels"},
+// Ch1 Météo (27)
+{t:"오늘 날씨가 어때요?",d:"Quel temps fait-il ?",ex:"오늘 날씨가 어때요?",exf:"Présent. Passé : 어땠어요 ?",ch:"Ch.1 Météo",img:"🌦️"},
+{t:"날씨가 좋다/나쁘다",d:"Il fait beau / mauvais",ex:"오늘은 날씨가 좋아요.",exf:"Il fait beau aujourd'hui.",ch:"Ch.1 Météo",img:"🌦️"},
+{t:"날씨가 좋아요",d:"Il fait beau",ex:"오늘 날씨가 좋아요.",exf:"= Aujourd'hui il fait beau.",ch:"Ch.1 Météo",img:"😎"},
+{t:"덥다",d:"Faire chaud",ex:"더워요.",exf:"= Il fait chaud. (덥다 → 더워요)",ch:"Ch.1 Météo",img:"🥵"},
+{t:"춥다",d:"Faire froid",ex:"추워요.",exf:"= Il fait froid. (춥다 → 추워요)",ch:"Ch.1 Météo",img:"🥶"},
+{t:"따뜻하다",d:"Faire doux / bon",ex:"따뜻해요.",exf:"= Il fait doux. (따뜻하다 → 따뜻해요)",ch:"Ch.1 Météo",img:"🌤️"},
+{t:"시원하다",d:"Faire frais (agréable)",ex:"시원해요.",exf:"= Il fait frais / rafraîchissant.",ch:"Ch.1 Météo",img:"🍃"},
+{t:"선선하다",d:"Être frais (agréable)",ex:"가을이 되니까 날씨가 선선해요.",exf:"Le temps est frais car c'est l'automne.",ch:"Ch.1 Météo",img:"🍃"},
+{t:"쌀쌀하다",d:"Être froid (désagréable)",ex:"날씨가 쌀쌀해요.",exf:"Il fait froid.",ch:"Ch.1 Météo",img:"🌬️"},
+{t:"기온이 높다",d:"Les températures sont élevées",ex:"기온이 높아서 날씨가 더워요.",exf:"Il fait chaud car les températures sont élevées.",ch:"Ch.1 Météo",img:"🥵"},
+{t:"기온이 낮다",d:"Les températures sont basses",ex:"기온이 낮아서 날씨가 추워요.",exf:"Il fait froid car les températures sont basses.",ch:"Ch.1 Météo",img:"🥶"},
+{t:"해",d:"Le soleil",ex:"해가 나요.",exf:"= Le soleil brille.",ch:"Ch.1 Météo",img:"☀️"},
+{t:"햇빛",d:"La lumière du soleil",ex:"햇빛이 강해요.",exf:"La lumière du soleil est forte.",ch:"Ch.1 Météo",img:"☀️"},
+{t:"하늘",d:"Le ciel",ex:"하늘이 파래요.",exf:"= Le ciel est bleu.",ch:"Ch.1 Météo",img:"🌥️"},
+{t:"하늘색",d:"Bleu ciel (couleur)",ex:"하늘색 가방",exf:"= 하늘 (ciel) + 색 (couleur)",ch:"Ch.1 Météo",img:"🩵"},
+{t:"무지개",d:"L'arc-en-ciel",ex:"무지개가 떴어요.",exf:"= Un arc-en-ciel est apparu.",ch:"Ch.1 Météo",img:"🌈"},
+{t:"비",d:"La pluie",ex:"비가 와요.",exf:"= Il pleut.",ch:"Ch.1 Météo",img:"🌧️"},
+{t:"비가 오다/내리다",d:"Pleuvoir",ex:"비가 오니까 우산을 쓰세요.",exf:"Il pleut, prenez un parapluie.",ch:"Ch.1 Météo",img:"☔"},
+{t:"비가 그치다",d:"La pluie s'arrête",ex:"비가 그쳐서 우산을 쓰지 않아요.",exf:"La pluie s'est arrêtée.",ch:"Ch.1 Météo",img:"🌤️"},
+{t:"눈",d:"La neige",ex:"눈이 와요.",exf:"= Il neige. (눈 = aussi « œil »)",ch:"Ch.1 Météo",img:"❄️"},
+{t:"구름",d:"Le nuage",ex:"구름이 많아요.",exf:"= Il y a beaucoup de nuages.",ch:"Ch.1 Météo",img:"☁️"},
+{t:"구름이 끼다",d:"Être nuageux",ex:"구름이 껴서 해가 보이지 않아요.",exf:"Il est nuageux, on ne voit pas le soleil.",ch:"Ch.1 Météo",img:"☁️"},
+{t:"안개가 끼다",d:"Avoir du brouillard",ex:"안개가 껴서 운전할 수 없어요.",exf:"Il y a du brouillard, je ne peux pas conduire.",ch:"Ch.1 Météo",img:"🌫️"},
+{t:"바람",d:"Le vent",ex:"바람이 불어요.",exf:"= Le vent souffle.",ch:"Ch.1 Météo",img:"💨"},
+{t:"바람이 불다",d:"Le vent souffle",ex:"바람이 많이 불어서 추워요.",exf:"Il fait froid car il y a beaucoup de vent.",ch:"Ch.1 Météo",img:"💨"},
+{t:"장마",d:"La saison des pluies",ex:"장마가 와요.",exf:"La saison des pluies arrive.",ch:"Ch.1 Météo",img:"🌧️"},
+{t:"태풍",d:"Le typhon",ex:"태풍이 와요. 바람이 강하게 불어요.",exf:"Le typhon approche. Le vent souffle fort.",ch:"Ch.1 Météo",img:"🌀"},
+// Saisons (7)
+{t:"계절",d:"Une saison",ex:"어느 계절을 좋아해요?",exf:"= Quelle saison aimes-tu ?",ch:"🌸 Saisons",img:"🍃"},
+{t:"사계절",d:"Les quatre saisons",ex:"한국에는 사계절이 있어요.",exf:"Il y a quatre saisons en Corée.",ch:"🌸 Saisons",img:"🍂"},
+{t:"봄",d:"Le printemps",ex:"봄에 꽃이 피어요.",exf:"= Au printemps les fleurs éclosent.",ch:"🌸 Saisons",img:"🌸"},
+{t:"여름",d:"L'été",ex:"여름에 더워요.",exf:"= En été il fait chaud.",ch:"🌸 Saisons",img:"🏖️"},
+{t:"가을",d:"L'automne",ex:"가을에 시원해요.",exf:"= En automne il fait frais.",ch:"🌸 Saisons",img:"🍁"},
+{t:"겨울",d:"L'hiver",ex:"겨울에 추워요.",exf:"= En hiver il fait froid.",ch:"🌸 Saisons",img:"❄️"},
+{t:"계절이 바뀌다",d:"La saison change",ex:"계절이 바뀌고 있어요.",exf:"La saison change.",ch:"🌸 Saisons",img:"🍁"},
+// Ch2 Shopping (9)
+{t:"명동",d:"Myeong-dong (cosmétiques)",ex:"명동에는 화장품 가게가 많이 있어요.",exf:"Il y a beaucoup de boutiques de cosmétiques.",ch:"Ch.2 Shopping",img:"💄"},
+{t:"동대문",d:"Dongdaemun (vêtements)",ex:"동대문에는 옷 가게가 많이 있어요.",exf:"Il y a beaucoup de magasins de vêtements.",ch:"Ch.2 Shopping",img:"👗"},
+{t:"시장",d:"Le marché",ex:"시장에서 옷을 사요.",exf:"J'achète des vêtements au marché.",ch:"Ch.2 Shopping",img:"🏪"},
+{t:"카페",d:"Le café",ex:"카페에서 친구를 만나요.",exf:"Je rencontre un ami dans un café.",ch:"Ch.2 Shopping",img:"☕"},
+{t:"깨끗하다",d:"Être propre",ex:"거리가 깨끗해요.",exf:"La rue est propre.",ch:"Ch.2 Shopping",img:"✨"},
+{t:"더럽다",d:"Être sale",ex:"거리가 더러워요.",exf:"La rue est sale.",ch:"Ch.2 Shopping",img:"🗑️"},
+{t:"복잡하다",d:"Être bondé / compliqué",ex:"길이 복잡해요.",exf:"La rue est bondée.",ch:"Ch.2 Shopping",img:"😵‍💫"},
+{t:"시끄럽다",d:"Être bruyant",ex:"그곳은 너무 시끄러워요.",exf:"C'est trop bruyant là-bas.",ch:"Ch.2 Shopping",img:"🔊"},
+{t:"알겠어요",d:"D'accord / compris",ex:"알겠어요. 같이 청소해요.",exf:"D'accord. Nettoyons ensemble.",ch:"Ch.2 Shopping",img:"👌"},
+// Ch3 Apparence (3)
+{t:"얼굴",d:"Le visage",ex:"그 사람의 얼굴을 알아요?",exf:"Connaissez-vous son visage ?",ch:"Ch.3 Apparence",img:"😀"},
+{t:"멋있다",d:"Être beau / cool",ex:"제 남자친구는 아주 멋있어요.",exf:"Mon petit ami est très beau.",ch:"Ch.3 Apparence",img:"😎"},
+{t:"귀엽다",d:"Être mignon",ex:"제 동생은 정말 귀여워요.",exf:"Mon petit frère est mignon.",ch:"Ch.3 Apparence",img:"🥰"},
+// Couleurs (11)
+{t:"빨간색",d:"Rouge",ex:"제 가방은 빨간색이에요.",exf:"Mon sac est rouge.",ch:"🎨 Couleurs",img:"🟥"},
+{t:"주황색",d:"Orange",ex:"주황색 우산을 써요.",exf:"J'utilise un parapluie orange.",ch:"🎨 Couleurs",img:"🟠"},
+{t:"노란색",d:"Jaune",ex:"노란색 꽃이 예뻐요.",exf:"La fleur jaune est jolie.",ch:"🎨 Couleurs",img:"🟡"},
+{t:"초록색",d:"Vert",ex:"초록색 나무가 많아요.",exf:"Il y a beaucoup d'arbres verts.",ch:"🎨 Couleurs",img:"🟢"},
+{t:"파란색",d:"Bleu",ex:"파란색 티셔츠를 자주 입어요.",exf:"Il porte souvent un T-shirt bleu.",ch:"🎨 Couleurs",img:"🟦"},
+{t:"보라색",d:"Violet",ex:"보라색 가방이 있어요.",exf:"J'ai un sac violet.",ch:"🎨 Couleurs",img:"🟣"},
+{t:"분홍색",d:"Rose",ex:"분홍색 옷을 좋아해요.",exf:"J'aime les vêtements roses.",ch:"🎨 Couleurs",img:"🩷"},
+{t:"갈색",d:"Marron",ex:"갈색 신발을 신어요.",exf:"Je porte des chaussures marron.",ch:"🎨 Couleurs",img:"🟤"},
+{t:"까만색",d:"Noir",ex:"까만색 바지를 입고 있어요.",exf:"Je porte un pantalon noir.",ch:"🎨 Couleurs",img:"⬛"},
+{t:"하얀색",d:"Blanc",ex:"하얀색 모자를 좋아해요.",exf:"Il aime les chapeaux blancs.",ch:"🎨 Couleurs",img:"⬜"},
+{t:"회색",d:"Gris",ex:"회색 코트를 입어요.",exf:"Je porte un manteau gris.",ch:"🎨 Couleurs",img:"🩶"},
+// Adjectifs (contraires) (20)
+{t:"크다",d:"Grand (taille)",ex:"집이 커요.",exf:"= La maison est grande. (크다 → 커요)",ch:"📏 Adjectifs (contraires)",img:"🐘"},
+{t:"작다",d:"Petit (taille)",ex:"집이 작아요.",exf:"= La maison est petite.",ch:"📏 Adjectifs (contraires)",img:"🐜"},
+{t:"많다",d:"Beaucoup / nombreux",ex:"사람이 많아요.",exf:"= Il y a beaucoup de gens.",ch:"📏 Adjectifs (contraires)",img:"🔢"},
+{t:"적다",d:"Peu (nombreux)",ex:"사람이 적어요.",exf:"= Il y a peu de gens.",ch:"📏 Adjectifs (contraires)",img:"🤏"},
+{t:"비싸다",d:"Cher (prix)",ex:"이거 비싸요.",exf:"= C'est cher.",ch:"📏 Adjectifs (contraires)",img:"💸"},
+{t:"싸다",d:"Pas cher (prix)",ex:"이거 싸요.",exf:"= C'est bon marché.",ch:"📏 Adjectifs (contraires)",img:"🪙"},
+{t:"길다",d:"Long (longueur)",ex:"머리가 길어요.",exf:"= Les cheveux sont longs.",ch:"📏 Adjectifs (contraires)",img:"📏"},
+{t:"짧다",d:"Court (longueur)",ex:"머리가 짧아요.",exf:"= Les cheveux sont courts.",ch:"📏 Adjectifs (contraires)",img:"✂️"},
+{t:"빠르다",d:"Rapide (vitesse)",ex:"차가 빨라요.",exf:"= La voiture est rapide. (르 irrég. → 빨라요)",ch:"📏 Adjectifs (contraires)",img:"⚡"},
+{t:"느리다",d:"Lent (vitesse)",ex:"버스가 느려요.",exf:"= Le bus est lent.",ch:"📏 Adjectifs (contraires)",img:"🐢"},
+{t:"무겁다",d:"Lourd (poids)",ex:"가방이 무거워요.",exf:"= Le sac est lourd. (ㅂ irrég. → 무거워요)",ch:"📏 Adjectifs (contraires)",img:"🏋️"},
+{t:"가볍다",d:"Léger (poids)",ex:"가방이 가벼워요.",exf:"= Le sac est léger.",ch:"📏 Adjectifs (contraires)",img:"🪶"},
+{t:"어렵다",d:"Difficile",ex:"한국어가 어려워요.",exf:"= Le coréen est difficile. (ㅂ irrég. → 어려워요)",ch:"📏 Adjectifs (contraires)",img:"😖"},
+{t:"쉽다",d:"Facile",ex:"시험이 쉬워요.",exf:"= L'examen est facile. (ㅂ irrég. → 쉬워요)",ch:"📏 Adjectifs (contraires)",img:"😌"},
+{t:"좋다",d:"Bon / bien (qualité)",ex:"기분이 좋아요.",exf:"= Je me sens bien.",ch:"📏 Adjectifs (contraires)",img:"👍"},
+{t:"나쁘다",d:"Mauvais (qualité)",ex:"날씨가 나빠요.",exf:"= Le temps est mauvais. (나쁘다 → 나빠요)",ch:"📏 Adjectifs (contraires)",img:"👎"},
+{t:"멀다",d:"Loin (distance)",ex:"학교가 멀어요.",exf:"= L'école est loin.",ch:"📏 Adjectifs (contraires)",img:"🔭"},
+{t:"가깝다",d:"Proche (distance)",ex:"집이 가까워요.",exf:"= La maison est proche. (ㅂ irrég. → 가까워요)",ch:"📏 Adjectifs (contraires)",img:"📍"},
+{t:"높다",d:"Haut (hauteur)",ex:"산이 높아요.",exf:"= La montagne est haute.",ch:"📏 Adjectifs (contraires)",img:"⬆️"},
+{t:"낮다",d:"Bas (hauteur)",ex:"건물이 낮아요.",exf:"= Le bâtiment est bas.",ch:"📏 Adjectifs (contraires)",img:"⬇️"},
+// Emotions (12)
+{t:"행복해요",d:"Être heureux",ex:"오늘 행복해요.",exf:"= Je suis heureux(se) aujourd'hui.",ch:"😊 Émotions",img:"😊"},
+{t:"신나요",d:"Être excité / enthousiaste",ex:"여행 가서 신나요!",exf:"= Je pars en voyage, trop hâte !",ch:"😊 Émotions",img:"🤩"},
+{t:"슬퍼요",d:"Être triste",ex:"영화가 슬퍼요.",exf:"= Le film est triste.",ch:"😊 Émotions",img:"😢"},
+{t:"화났어요",d:"Être en colère",ex:"동생이 화났어요.",exf:"= Mon frère/ma sœur est en colère.",ch:"😊 Émotions",img:"😠"},
+{t:"짜증나요",d:"Être agacé / énervant",ex:"너무 짜증나요.",exf:"= C'est vraiment énervant.",ch:"😊 Émotions",img:"😤"},
+{t:"무서워요",d:"Avoir peur / effrayant",ex:"무서워요!",exf:"= J'ai peur !",ch:"😊 Émotions",img:"😱"},
+{t:"심심해요",d:"S'ennuyer",ex:"집에서 심심해요.",exf:"= Je m'ennuie à la maison.",ch:"😊 Émotions",img:"😑"},
+{t:"배고파요",d:"Avoir faim",ex:"배고파요!",exf:"= J'ai faim ! (배 = ventre)",ch:"😊 Émotions",img:"🍽️"},
+{t:"배불러요",d:"Être rassasié / trop mangé",ex:"많이 먹어서 배불러요.",exf:"= J'ai trop mangé, je suis plein(e).",ch:"😊 Émotions",img:"🤤"},
+{t:"피곤해요",d:"Être fatigué",ex:"오늘 피곤해요.",exf:"= Je suis fatigué(e) aujourd'hui.",ch:"😊 Émotions",img:"😴"},
+{t:"힘들어요",d:"Être épuisant / dur",ex:"일이 힘들어요.",exf:"= Le travail est épuisant.",ch:"😊 Émotions",img:"😮‍💨"},
+{t:"아파요",d:"Être malade / avoir mal",ex:"머리가 아파요.",exf:"= J'ai mal à la tête.",ch:"😊 Émotions",img:"🤕"},
+// Ch4 Courses (12)
+{t:"마트",d:"Le supermarché",ex:"마트에서 장을 봐요.",exf:"Je fais les courses au supermarché.",ch:"Ch.4 Courses",img:"🛒"},
+{t:"공짜",d:"Gratuit (familier)",ex:"하나는 공짜예요.",exf:"Un est gratuit.",ch:"Ch.4 Courses",img:"🆓"},
+{t:"할인",d:"Rabais / réduction",ex:"할인 받을 수 있어요?",exf:"Puis-je avoir une remise ?",ch:"Ch.4 Courses",img:"🏷️"},
+{t:"소고기",d:"Le bœuf",ex:"소고기로 불고기를 해 먹어요.",exf:"On fait du bulgogi au bœuf.",ch:"Ch.4 Courses",img:"🥩"},
+{t:"돼지고기",d:"Le porc",ex:"삼겹살을 좋아해요.",exf:"J'aime le samgyeopsal.",ch:"Ch.4 Courses",img:"🥓"},
+{t:"닭고기",d:"Le poulet",ex:"닭고기를 튀겨서 치킨을 만들어요.",exf:"On frit le poulet pour faire du poulet frit.",ch:"Ch.4 Courses",img:"🍗"},
+{t:"야채",d:"Le légume",ex:"고기와 야채를 같이 먹어야 해요.",exf:"Il faut manger viande et légumes.",ch:"Ch.4 Courses",img:"🥬"},
+{t:"쌀",d:"Le riz (cru)",ex:"쌀을 씻어서 밥을 지어요.",exf:"Lavez le riz et faites-le cuire.",ch:"Ch.4 Courses",img:"🌾"},
+{t:"밀가루",d:"La farine",ex:"빵을 만들 거예요. 밀가루가 필요해요.",exf:"Je vais faire du pain. J'ai besoin de farine.",ch:"Ch.4 Courses",img:"🥖"},
+{t:"고추장",d:"Gochujang (pâte de piment)",ex:"떡볶이에는 고추장이 필요해요.",exf:"Le tteokbokki nécessite du gochujang.",ch:"Ch.4 Courses",img:"🌶️"},
+{t:"된장",d:"Doenjang (pâte de soja)",ex:"된장찌개에는 된장이 필요해요.",exf:"Le doenjang-jjigae nécessite du doenjang.",ch:"Ch.4 Courses",img:"🫘"},
+{t:"간장",d:"Sauce soja",ex:"간장을 많이 넣어서 짜요.",exf:"C'est salé car j'ai mis beaucoup de sauce soja.",ch:"Ch.4 Courses",img:"🫗"},
+// Ch5 Commande (10)
+{t:"예약",d:"La réservation",ex:"이 메뉴는 예약하셔야 돼요.",exf:"Vous devez réserver pour ce menu.",ch:"Ch.5 Commande",img:"📅"},
+{t:"주문",d:"La commande",ex:"저희 주문할게요.",exf:"Nous aimerions commander.",ch:"Ch.5 Commande",img:"📝"},
+{t:"취소",d:"L'annulation",ex:"메뉴 하나는 취소하고 싶어요.",exf:"Je voudrais annuler un plat.",ch:"Ch.5 Commande",img:"❌"},
+{t:"포장",d:"À emporter",ex:"이 음식을 포장해 주세요.",exf:"Ce plat à emporter, s'il vous plaît.",ch:"Ch.5 Commande",img:"🥡"},
+{t:"접시",d:"L'assiette",ex:"이 접시에 음식을 담으세요.",exf:"Mettez la nourriture dans cette assiette.",ch:"Ch.5 Commande",img:"🍽️"},
+{t:"숟가락",d:"La cuillère",ex:"숟가락 좀 바꿔 주세요.",exf:"Changez-moi la cuillère.",ch:"Ch.5 Commande",img:"🥄"},
+{t:"젓가락",d:"Les baguettes",ex:"젓가락으로 자장면을 먹어요.",exf:"Je mange avec des baguettes.",ch:"Ch.5 Commande",img:"🥢"},
+{t:"수저",d:"Cuillère + baguettes",ex:"여기 수저 좀 주세요.",exf:"Donnez-moi des couverts.",ch:"Ch.5 Commande",img:"🍴"},
+{t:"계산",d:"L'addition / paiement",ex:"계산을 할까요?",exf:"On paie ?",ch:"Ch.5 Commande",img:"💳"},
+{t:"영수증",d:"Le reçu",ex:"영수증을 드릴까요?",exf:"Souhaitez-vous un reçu ?",ch:"Ch.5 Commande",img:"🧾"},
+// Ch6 Vacances (5)
+{t:"해외여행",d:"Voyage à l'étranger",ex:"해외여행을 갈 거예요.",exf:"Je pars à l'étranger.",ch:"Ch.6 Vacances",img:"✈️"},
+{t:"항공권",d:"Billet d'avion",ex:"항공권을 싸게 샀어요.",exf:"J'ai acheté mon billet d'avion à bas prix.",ch:"Ch.6 Vacances",img:"🎫"},
+{t:"기차표",d:"Billet de train",ex:"기차표를 샀어요.",exf:"J'ai acheté un billet de train.",ch:"Ch.6 Vacances",img:"🚄"},
+{t:"경치",d:"Le paysage",ex:"경치가 아름다워요.",exf:"Le paysage est magnifique.",ch:"Ch.6 Vacances",img:"🏞️"},
+{t:"관광",d:"Le tourisme",ex:"거기에 가서 관광을 할 거예요.",exf:"Je vais y faire du tourisme.",ch:"Ch.6 Vacances",img:"📸"},
+// Ch7 Sante (12)
+{t:"내과",d:"Médecine interne",ex:"배가 아파서 내과에 가요.",exf:"J'ai mal au ventre, je vais en médecine interne.",ch:"Ch.7 Santé",img:"🩺"},
+{t:"치과",d:"Le dentiste",ex:"이를 뽑으러 치과에 가요.",exf:"Je vais chez le dentiste.",ch:"Ch.7 Santé",img:"🦷"},
+{t:"기침",d:"La toux",ex:"감기에 걸려서 기침이 나요.",exf:"Je tousse car j'ai un rhume.",ch:"Ch.7 Santé",img:"😷"},
+{t:"두통",d:"Le mal de tête",ex:"스트레스를 받아서 두통이 생겼어요.",exf:"J'ai mal à la tête à cause du stress.",ch:"Ch.7 Santé",img:"🤕"},
+{t:"배탈",d:"Maux d'estomac",ex:"매운 음식을 먹어서 배탈이 났어요.",exf:"J'ai mal au ventre car j'ai mangé épicé.",ch:"Ch.7 Santé",img:"🤢"},
+{t:"재채기",d:"L'éternuement",ex:"봄에 재채기가 나요.",exf:"J'éternue au printemps.",ch:"Ch.7 Santé",img:"🤧"},
+{t:"콧물",d:"Nez qui coule",ex:"감기에 걸려서 콧물이 나와요.",exf:"J'ai le nez qui coule.",ch:"Ch.7 Santé",img:"👃"},
+{t:"열",d:"La fièvre",ex:"몸에서 열이 나요.",exf:"J'ai de la fièvre.",ch:"Ch.7 Santé",img:"🤒"},
+{t:"치료",d:"Le traitement",ex:"의사 선생님이 치료해 주실 거예요.",exf:"Le médecin vous soignera.",ch:"Ch.7 Santé",img:"🩹"},
+{t:"감기약",d:"Médicament contre le rhume",ex:"약국에서 감기약을 사요.",exf:"J'achète un médicament à la pharmacie.",ch:"Ch.7 Santé",img:"💊"},
+{t:"소화제",d:"Médicament digestif",ex:"소화가 안 돼서 소화제를 먹었어요.",exf:"J'ai pris un digestif.",ch:"Ch.7 Santé",img:"💊"},
+{t:"수술",d:"L'opération chirurgicale",ex:"빨리 수술하세요.",exf:"Faites-vous opérer vite.",ch:"Ch.7 Santé",img:"🏥"},
+// Ch8 Cinema (8)
+{t:"예매",d:"Réservation (billets)",ex:"영화 표는 제가 예매할게요.",exf:"Je vais réserver les billets.",ch:"Ch.8 Cinéma",img:"🎟️"},
+{t:"시간표",d:"Horaire des séances",ex:"영화 시간표를 확인해 볼게요.",exf:"Je vais vérifier les horaires.",ch:"Ch.8 Cinéma",img:"🕐"},
+{t:"자리",d:"La place / le siège",ex:"자리가 없어요.",exf:"Il n'y a pas de places.",ch:"Ch.8 Cinéma",img:"💺"},
+{t:"무료",d:"Gratuit (formel)",ex:"한 명은 무료로 볼 수 있어요.",exf:"Une personne peut regarder gratuitement.",ch:"Ch.8 Cinéma",img:"🆓"},
+{t:"팔리다",d:"Être vendu",ex:"표가 다 팔렸어요.",exf:"Tous les billets sont vendus.",ch:"Ch.8 Cinéma",img:"💰"},
+{t:"남다",d:"Rester (il reste qqch)",ex:"시간이 남았어요.",exf:"Il reste du temps.",ch:"Ch.8 Cinéma",img:"📦"},
+{t:"무섭다",d:"Effrayant",ex:"이 영화는 정말 무서워요.",exf:"Ce film fait vraiment peur.",ch:"Ch.8 Cinéma",img:"😱"},
+{t:"지루하다",d:"Ennuyeux",ex:"영화가 좀 지루했어요.",exf:"Le film était un peu ennuyeux.",ch:"Ch.8 Cinéma",img:"🥱"},
+// Ch9 Loisirs (5)
+{t:"낚시",d:"La pêche",ex:"주말에 낚시하러 갈 거예요.",exf:"Je vais pêcher ce week-end.",ch:"Ch.9 Loisirs",img:"🎣"},
+{t:"경기",d:"Le match",ex:"운동 경기를 보러 갈래요?",exf:"On va voir un match ?",ch:"Ch.9 Loisirs",img:"⚽"},
+{t:"소풍",d:"Le pique-nique",ex:"공원으로 소풍 갈래요?",exf:"On va pique-niquer au parc ?",ch:"Ch.9 Loisirs",img:"🧺"},
+{t:"부지런하다",d:"Être diligent",ex:"정말 부지런하네요.",exf:"Vous êtes vraiment diligent.",ch:"Ch.9 Loisirs",img:"🐝"},
+{t:"귀찮다",d:"Avoir la flemme",ex:"나가기 귀찮아요.",exf:"J'ai la flemme de sortir.",ch:"Ch.9 Loisirs",img:"🛋️"},
+// Ch10 Vie scolaire (13)
+{t:"교환 학생",d:"Étudiant d'échange",ex:"교환 학생으로 한국에 가요.",exf:"Je pars en Corée comme étudiant d'échange.",ch:"Ch.10 Vie scolaire",img:"🧑‍🎓"},
+{t:"전공",d:"Spécialité / filière",ex:"전공이 뭐예요?",exf:"Quelle est votre spécialité ?",ch:"Ch.10 Vie scolaire",img:"📚"},
+{t:"대학원",d:"École doctorale",ex:"졸업 후에 대학원을 갈 거예요.",exf:"J'irai en école doctorale après le diplôme.",ch:"Ch.10 Vie scolaire",img:"🎓"},
+{t:"학기",d:"Le semestre",ex:"새 학기를 시작했어요.",exf:"Le nouveau semestre a commencé.",ch:"Ch.10 Vie scolaire",img:"🗓️"},
+{t:"학년",d:"Année scolaire",ex:"벌써 2학년이 돼요.",exf:"Je passe en deuxième année.",ch:"Ch.10 Vie scolaire",img:"📅"},
+{t:"출석하다",d:"Assister au cours",ex:"날마다 수업에 출석해요.",exf:"J'assiste au cours tous les jours.",ch:"Ch.10 Vie scolaire",img:"🙋"},
+{t:"결석하다",d:"Être absent",ex:"아파서 결석했어요.",exf:"J'étais absent car j'étais malade.",ch:"Ch.10 Vie scolaire",img:"🙅"},
+{t:"지각",d:"Le retard",ex:"수업에 지각했어요.",exf:"J'étais en retard au cours.",ch:"Ch.10 Vie scolaire",img:"⏰"},
+{t:"성적",d:"Les notes",ex:"좋은 성적을 받았어요.",exf:"J'ai eu de bonnes notes.",ch:"Ch.10 Vie scolaire",img:"💯"},
+{t:"규칙",d:"La règle",ex:"규칙을 지켜요.",exf:"On respecte les règles.",ch:"Ch.10 Vie scolaire",img:"📋"},
+{t:"안내문",d:"Guide / notice",ex:"학교생활 안내문을 받았어요.",exf:"J'ai reçu un guide scolaire.",ch:"Ch.10 Vie scolaire",img:"📄"},
+{t:"게시판",d:"Tableau d'affichage",ex:"학교 게시판을 봤어요.",exf:"J'ai consulté le tableau d'affichage.",ch:"Ch.10 Vie scolaire",img:"📌"},
+{t:"모임",d:"Rencontre / réunion",ex:"친구들과 모임이 있어요.",exf:"J'ai une rencontre avec des amis.",ch:"Ch.10 Vie scolaire",img:"👥"},
+// Jours semaine (8)
+{t:"요일",d:"Le jour de la semaine",ex:"무슨 요일이에요?",exf:"= Quel jour sommes-nous ? ([jour]+요일)",ch:"📅 Jours de la semaine",img:"📅"},
+{t:"월요일",d:"Lundi",ex:"월요일에 일해요.",exf:"(월 = lune)",ch:"📅 Jours de la semaine",img:"🌙"},
+{t:"화요일",d:"Mardi",ex:"화요일에 만나요.",exf:"(화 = feu)",ch:"📅 Jours de la semaine",img:"🔥"},
+{t:"수요일",d:"Mercredi",ex:"수요일이에요.",exf:"(수 = eau)",ch:"📅 Jours de la semaine",img:"💧"},
+{t:"목요일",d:"Jeudi",ex:"목요일에 시험이 있어요.",exf:"(목 = bois / arbre)",ch:"📅 Jours de la semaine",img:"🌳"},
+{t:"금요일",d:"Vendredi",ex:"드디어 금요일!",exf:"(금 = or / métal)",ch:"📅 Jours de la semaine",img:"🪙"},
+{t:"토요일",d:"Samedi",ex:"토요일에 쉬어요.",exf:"(토 = terre)",ch:"📅 Jours de la semaine",img:"🪨"},
+{t:"일요일",d:"Dimanche",ex:"일요일에 쉬어요.",exf:"(일 = soleil)",ch:"📅 Jours de la semaine",img:"☀️"},
+// Date & heure (11)
+{t:"년 + 월 + 일 + 요일",d:"L'ordre d'une date",ex:"2025년 3월 5일 수요일",exf:"Du plus grand au plus petit : [année]년 [mois]월 [jour]일 [nom]요일",ch:"🕐 Date & heure",img:"📆"},
+{t:"년",d:"L'année (date)",ex:"2025년",exf:"Sino + 년 (이천이십오 년)",ch:"🕐 Date & heure",img:"📅"},
+{t:"월",d:"Le mois",ex:"삼월 = mars",exf:"Sino + 월 (일월, 이월, 삼월…)",ch:"🕐 Date & heure",img:"🗓️"},
+{t:"일",d:"Le jour (date)",ex:"오 일 = le 5",exf:"Sino + 일",ch:"🕐 Date & heure",img:"📆"},
+{t:"몇 시예요?",d:"Quelle heure est-il ?",ex:"지금 몇 시예요?",exf:"= Il est quelle heure maintenant ?",ch:"🕐 Date & heure",img:"🕐"},
+{t:"시",d:"L'heure (h)",ex:"세 시 = 3h",exf:"Chiffre NATIF + 시",ch:"🕐 Date & heure",img:"🕒"},
+{t:"분",d:"La minute",ex:"삼십 분 = 30 min",exf:"Chiffre SINO + 분",ch:"🕐 Date & heure",img:"⏱️"},
+{t:"반",d:"Et demie",ex:"두 시 반 = 2h30",exf:"반 = la moitié",ch:"🕐 Date & heure",img:"🌗"},
+{t:"시간",d:"La durée (en heures)",ex:"세 시간 = 3 heures",exf:"Natif + 시간 (durée, pas l'heure qu'il est)",ch:"🕐 Date & heure",img:"⌛"},
+{t:"오전",d:"Le matin (AM)",ex:"오전 아홉 시",exf:"= 9h du matin",ch:"🕐 Date & heure",img:"🌄"},
+{t:"오후",d:"L'après-midi (PM)",ex:"오후 세 시",exf:"= 15h (3h de l'après-midi)",ch:"🕐 Date & heure",img:"🌆"},
+// Moments du jour (5)
+{t:"새벽",d:"L'aube / petit matin",ex:"새벽에 일어나요.",exf:"= Je me lève à l'aube.",ch:"🌗 Moments du jour",img:"🌌"},
+{t:"아침",d:"Le matin",ex:"아침에 커피를 마셔요.",exf:"= Le matin je bois un café. (aussi : petit-déj)",ch:"🌗 Moments du jour",img:"🌅"},
+{t:"점심",d:"Midi / déjeuner",ex:"점심을 먹어요.",exf:"= Je déjeune.",ch:"🌗 Moments du jour",img:"🍱"},
+{t:"저녁",d:"Le soir / dîner",ex:"저녁에 쉬어요.",exf:"= Le soir je me repose. (aussi : dîner)",ch:"🌗 Moments du jour",img:"🌇"},
+{t:"밤",d:"La nuit",ex:"밤에 자요.",exf:"= La nuit je dors.",ch:"🌗 Moments du jour",img:"🌙"},
+// Temps & dates (23)
+{t:"그저께",d:"Avant-hier",ex:"그저께 도착했어요.",exf:"= Je suis arrivé(e) avant-hier.",ch:"🗓️ Temps & dates",img:"⏪"},
+{t:"어제",d:"Hier",ex:"어제 왔어요.",exf:"= Je suis venu(e) hier.",ch:"🗓️ Temps & dates",img:"⬅️"},
+{t:"오늘",d:"Aujourd'hui",ex:"오늘 바빠요.",exf:"= Aujourd'hui je suis occupé(e).",ch:"🗓️ Temps & dates",img:"📍"},
+{t:"내일",d:"Demain",ex:"내일 만나요.",exf:"= On se voit demain.",ch:"🗓️ Temps & dates",img:"➡️"},
+{t:"모레",d:"Après-demain",ex:"모레 시험이 있어요.",exf:"= Après-demain j'ai un examen.",ch:"🗓️ Temps & dates",img:"⏩"},
+{t:"하루",d:"Un jour / une journée",ex:"하루 동안 방을 청소해요.",exf:"Je nettoie ma chambre pendant une journée.",ch:"🗓️ Temps & dates",img:"1️⃣"},
+{t:"이틀",d:"Deux jours",ex:"이틀 동안 수영을 배워요.",exf:"J'apprends à nager pendant deux jours.",ch:"🗓️ Temps & dates",img:"2️⃣"},
+{t:"사흘",d:"Trois jours",ex:"사흘 동안 시험을 봐요.",exf:"Je passe un examen pendant trois jours.",ch:"🗓️ Temps & dates",img:"3️⃣"},
+{t:"지난주",d:"La semaine dernière",ex:"지난주에 여행을 갔어요.",exf:"La semaine dernière, je suis parti(e) en voyage.",ch:"🗓️ Temps & dates",img:"🔙"},
+{t:"이번 주",d:"Cette semaine",ex:"이번 주에 시험이 있어요.",exf:"Il y a un examen cette semaine.",ch:"🗓️ Temps & dates",img:"📆"},
+{t:"다음 주",d:"La semaine prochaine",ex:"다음 주에 만나요.",exf:"On se voit la semaine prochaine.",ch:"🗓️ Temps & dates",img:"⏭️"},
+{t:"매주",d:"Chaque semaine",ex:"매주 친구를 만나요.",exf:"Je vois mon ami chaque semaine.",ch:"🗓️ Temps & dates",img:"📅"},
+{t:"주말",d:"Le week-end",ex:"주말에 쉬어요.",exf:"Je me repose le week-end.",ch:"🗓️ Temps & dates",img:"🛌"},
+{t:"평일",d:"Jour de semaine",ex:"평일이라서 표가 많아요.",exf:"Il y a beaucoup de billets en semaine.",ch:"🗓️ Temps & dates",img:"🗓️"},
+{t:"휴일",d:"Jour de congé",ex:"휴일에 영화 볼까요?",exf:"On regarde un film le jour de congé ?",ch:"🗓️ Temps & dates",img:"🏖️"},
+{t:"지난달",d:"Le mois dernier",ex:"지난달에 여행했어요.",exf:"= Le mois dernier j'ai voyagé.",ch:"🗓️ Temps & dates",img:"🔙"},
+{t:"이번 달",d:"Ce mois-ci",ex:"이번 달에 바빠요.",exf:"= Ce mois-ci je suis occupé(e).",ch:"🗓️ Temps & dates",img:"🗓️"},
+{t:"다음 달",d:"Le mois prochain",ex:"다음 달에 시작해요.",exf:"= Ça commence le mois prochain.",ch:"🗓️ Temps & dates",img:"🔜"},
+{t:"작년",d:"L'année dernière",ex:"작년에 졸업했어요.",exf:"= J'ai eu mon diplôme l'an dernier.",ch:"🗓️ Temps & dates",img:"🔙"},
+{t:"올해",d:"Cette année",ex:"올해 한국에 가요.",exf:"= Cette année je vais en Corée.",ch:"🗓️ Temps & dates",img:"📆"},
+{t:"내년",d:"L'année prochaine",ex:"내년에 이사해요.",exf:"= L'année prochaine je déménage.",ch:"🗓️ Temps & dates",img:"🔜"},
+{t:"매일",d:"Chaque jour",ex:"매일 운동해요.",exf:"Je fais du sport tous les jours.",ch:"🗓️ Temps & dates",img:"🔄"},
+{t:"에",d:"Particule de temps (à / en)",ex:"세 시에 만나요.",exf:"= On se voit à 3h. [temps] + 에",ch:"🗓️ Temps & dates",img:"📌"},
+// Adverbes (10)
+{t:"늘",d:"Toujours",ex:"늘 한국어 공부를 해요.",exf:"J'étudie toujours le coréen.",ch:"💬 Adverbes",img:"♾️"},
+{t:"자주",d:"Souvent",ex:"자주 커피를 마셔요.",exf:"Je bois souvent du café.",ch:"💬 Adverbes",img:"🔁"},
+{t:"가끔",d:"De temps en temps",ex:"가끔 한국 음식을 먹어요.",exf:"Je mange coréen de temps en temps.",ch:"💬 Adverbes",img:"🎲"},
+{t:"거의",d:"Presque",ex:"거의 약속이 있어요.",exf:"J'ai presque toujours des plans.",ch:"💬 Adverbes",img:"🔜"},
+{t:"아주",d:"Très",ex:"아주 맛있어요.",exf:"C'est très bon.",ch:"💬 Adverbes",img:"⭐"},
+{t:"너무",d:"Trop",ex:"너무 비싸요.",exf:"C'est trop cher.",ch:"💬 Adverbes",img:"❗"},
+{t:"조금",d:"Un peu",ex:"조금 피곤해요.",exf:"Je suis un peu fatigué(e).",ch:"💬 Adverbes",img:"🤏"},
+{t:"빨리",d:"Vite / rapidement",ex:"빨리 오세요.",exf:"Venez vite.",ch:"💬 Adverbes",img:"⚡"},
+{t:"천천히",d:"Lentement",ex:"천천히 말하세요.",exf:"Parlez lentement.",ch:"💬 Adverbes",img:"🐢"},
+{t:"그러면",d:"Alors, dans ce cas",ex:"그러면 비빔밥은 어때요?",exf:"Alors, et le bibimbap ?",ch:"💬 Adverbes",img:"💭"},
+// Nombres natifs (20)
+{t:"하나",d:"1 · un",ex:"한 살",exf:"Natif · âge, objets (하나→한 devant un compteur)",ch:"🔢 Nombres natifs",img:"1️⃣"},
+{t:"둘",d:"2 · deux",ex:"두 살",exf:"Natif (둘→두 devant un compteur)",ch:"🔢 Nombres natifs",img:"2️⃣"},
+{t:"셋",d:"3 · trois",ex:"세 개",exf:"Natif (셋→세 devant un compteur)",ch:"🔢 Nombres natifs",img:"3️⃣"},
+{t:"넷",d:"4 · quatre",ex:"네 개",exf:"Natif (넷→네 devant un compteur)",ch:"🔢 Nombres natifs",img:"4️⃣"},
+{t:"다섯",d:"5 · cinq",ex:"다섯 개",exf:"Natif · pour compter",ch:"🔢 Nombres natifs",img:"5️⃣"},
+{t:"여섯",d:"6 · six",ex:"여섯 개",exf:"Natif · pour compter",ch:"🔢 Nombres natifs",img:"6️⃣"},
+{t:"일곱",d:"7 · sept",ex:"일곱 개",exf:"Natif · pour compter",ch:"🔢 Nombres natifs",img:"7️⃣"},
+{t:"여덟",d:"8 · huit",ex:"여덟 개",exf:"Natif · pour compter",ch:"🔢 Nombres natifs",img:"8️⃣"},
+{t:"아홉",d:"9 · neuf",ex:"아홉 개",exf:"Natif · pour compter",ch:"🔢 Nombres natifs",img:"9️⃣"},
+{t:"열",d:"10 · dix",ex:"열 개",exf:"Natif · pour compter",ch:"🔢 Nombres natifs",img:"🔟"},
+{t:"스물",d:"20 · vingt",ex:"스물 살",exf:"Natif · âge (스물→스무 devant compteur)",ch:"🔢 Nombres natifs",img:"🔢"},
+{t:"서른",d:"30 · trente",ex:"서른 살",exf:"Natif · âge",ch:"🔢 Nombres natifs",img:"🔢"},
+{t:"마흔",d:"40 · quarante",ex:"마흔 살",exf:"Natif · âge",ch:"🔢 Nombres natifs",img:"🔢"},
+{t:"쉰",d:"50 · cinquante",ex:"쉰 살",exf:"Natif · âge",ch:"🔢 Nombres natifs",img:"🔢"},
+{t:"예순",d:"60 · soixante",ex:"예순 살",exf:"Natif · âge",ch:"🔢 Nombres natifs",img:"🔢"},
+{t:"일흔",d:"70 · soixante-dix",ex:"일흔 살",exf:"Natif · âge",ch:"🔢 Nombres natifs",img:"🔢"},
+{t:"여든",d:"80 · quatre-vingts",ex:"여든 살",exf:"Natif · âge",ch:"🔢 Nombres natifs",img:"🔢"},
+{t:"아흔",d:"90 · quatre-vingt-dix",ex:"아흔 살",exf:"Natif · âge",ch:"🔢 Nombres natifs",img:"🔢"},
+{t:"열하나",d:"11 · construction",ex:"열 + 하나",exf:"[dizaine] + [unité]. Ex : 열한 살 = 11 ans",ch:"🔢 Nombres natifs",img:"🧩"},
+{t:"스물다섯",d:"25 · construction",ex:"스물 + 다섯",exf:"20 + 5 → 스물다섯 살 = 25 ans",ch:"🔢 Nombres natifs",img:"🧩"},
+// Nombres sino (18)
+{t:"일",d:"1 · un",ex:"일 월",exf:"Sino · dates, argent, minutes (janvier)",ch:"🔟 Nombres sino",img:"1️⃣"},
+{t:"이",d:"2 · deux",ex:"이 월",exf:"Sino (février)",ch:"🔟 Nombres sino",img:"2️⃣"},
+{t:"삼",d:"3 · trois",ex:"삼 월",exf:"Sino (mars)",ch:"🔟 Nombres sino",img:"3️⃣"},
+{t:"사",d:"4 · quatre",ex:"사 월",exf:"Sino (avril)",ch:"🔟 Nombres sino",img:"4️⃣"},
+{t:"오",d:"5 · cinq",ex:"오 월",exf:"Sino (mai)",ch:"🔟 Nombres sino",img:"5️⃣"},
+{t:"육",d:"6 · six",ex:"육 개월",exf:"Sino (6 mois)",ch:"🔟 Nombres sino",img:"6️⃣"},
+{t:"칠",d:"7 · sept",ex:"칠 월",exf:"Sino (juillet)",ch:"🔟 Nombres sino",img:"7️⃣"},
+{t:"팔",d:"8 · huit",ex:"팔 월",exf:"Sino (août)",ch:"🔟 Nombres sino",img:"8️⃣"},
+{t:"구",d:"9 · neuf",ex:"구 월",exf:"Sino (septembre)",ch:"🔟 Nombres sino",img:"9️⃣"},
+{t:"십",d:"10 · dix",ex:"십 분",exf:"Sino (10 minutes)",ch:"🔟 Nombres sino",img:"🔟"},
+{t:"백",d:"100 · cent",ex:"백 원",exf:"Sino (100 wons)",ch:"🔟 Nombres sino",img:"💯"},
+{t:"천",d:"1 000 · mille",ex:"천 원",exf:"Sino (1000 wons). 1000 = 천 tout seul",ch:"🔟 Nombres sino",img:"🔢"},
+{t:"만",d:"10 000 · dix mille",ex:"만 원",exf:"Sino. Le coréen groupe par 만 (10 000), pas par 1000",ch:"🔟 Nombres sino",img:"🔢"},
+{t:"이십",d:"20 · règle des dizaines",ex:"이 + 십",exf:"[unité] + 십 = ×10. 30=삼십, 70=칠십, 90=구십",ch:"🔟 Nombres sino",img:"🧩"},
+{t:"칠십삼",d:"73 · construction",ex:"칠십 + 삼",exf:"(7×10) + 3",ch:"🔟 Nombres sino",img:"🧩"},
+{t:"칠백오십오",d:"755 · construction",ex:"칠백 + 오십 + 오",exf:"700 + 50 + 5",ch:"🔟 Nombres sino",img:"🧩"},
+{t:"이천",d:"2 000 · construction",ex:"이 × 천",exf:"2 × 1000. 1000=천, 2000=이천",ch:"🔟 Nombres sino",img:"🧩"},
+{t:"이만",d:"20 000 · construction",ex:"이 × 만",exf:"2 × 10 000. 10 000=만, 20 000=이만",ch:"🔟 Nombres sino",img:"🧩"},
+// Verbes essentiels (85)
+{t:"하다",d:"faire",ex:"숙제를 해요.",exf:"Je fais mes devoirs.",ch:"Verbes essentiels",img:"✅"},
+{t:"되다",d:"devenir / fonctionner",ex:"의사가 되고 싶어요.",exf:"Je veux devenir médecin.",ch:"Verbes essentiels",img:"🦋"},
+{t:"있다",d:"être (là) / avoir",ex:"시간이 있어요.",exf:"J'ai du temps.",ch:"Verbes essentiels",img:"📍"},
+{t:"없다",d:"ne pas avoir",ex:"돈이 없어요.",exf:"Je n'ai pas d'argent.",ch:"Verbes essentiels",img:"🕳️"},
+{t:"가다",d:"aller",ex:"학교에 가요.",exf:"Je vais à l'école.",ch:"Verbes essentiels",img:"➡️"},
+{t:"오다",d:"venir",ex:"친구가 와요.",exf:"Un ami vient.",ch:"Verbes essentiels",img:"⬅️"},
+{t:"나가다",d:"sortir",ex:"밖에 나가요.",exf:"= Je sors dehors. (밖 = dehors)",ch:"Verbes essentiels",img:"🚪"},
+{t:"들어가다",d:"entrer",ex:"집에 들어가요.",exf:"= J'entre à la maison.",ch:"Verbes essentiels",img:"🏠"},
+{t:"출발하다",d:"partir / démarrer",ex:"지금 출발해요.",exf:"= Je pars maintenant.",ch:"Verbes essentiels",img:"🛫"},
+{t:"도착하다",d:"arriver",ex:"공항에 도착해요.",exf:"= J'arrive à l'aéroport.",ch:"Verbes essentiels",img:"🛬"},
+{t:"타다",d:"prendre (transport)",ex:"버스를 타요.",exf:"Je prends le bus.",ch:"Verbes essentiels",img:"🚗"},
+{t:"내리다",d:"descendre",ex:"여기에서 내려요.",exf:"Je descends ici.",ch:"Verbes essentiels",img:"⬇️"},
+{t:"걷다",d:"marcher (ㄷ irrég.)",ex:"공원을 걸어요.",exf:"Je marche dans le parc.",ch:"Verbes essentiels",img:"🚶"},
+{t:"뛰다",d:"courir",ex:"빨리 뛰어요.",exf:"Je cours vite.",ch:"Verbes essentiels",img:"🏃"},
+{t:"다니다",d:"fréquenter (aller régulièrement)",ex:"학교에 다녀요.",exf:"= Je vais à l'école (régulièrement). (다니다 → 다녀요)",ch:"Verbes essentiels",img:"🏫"},
+{t:"운전하다",d:"conduire",ex:"차를 운전해요.",exf:"= Je conduis une voiture.",ch:"Verbes essentiels",img:"🚘"},
+{t:"일어나다",d:"se lever",ex:"아침 7시에 일어나요.",exf:"Je me lève à 7h.",ch:"Verbes essentiels",img:"🌅"},
+{t:"자다",d:"dormir",ex:"일찍 자요.",exf:"Je me couche tôt.",ch:"Verbes essentiels",img:"😴"},
+{t:"씻다",d:"(se) laver",ex:"손을 씻어요.",exf:"= Je me lave les mains.",ch:"Verbes essentiels",img:"🧼"},
+{t:"쉬다",d:"se reposer",ex:"주말에 쉬어요.",exf:"= Je me repose le week-end.",ch:"Verbes essentiels",img:"🛋️"},
+{t:"먹다",d:"manger",ex:"밥을 먹어요.",exf:"Je mange.",ch:"Verbes essentiels",img:"😋"},
+{t:"마시다",d:"boire",ex:"물을 마셔요.",exf:"Je bois de l'eau.",ch:"Verbes essentiels",img:"🥤"},
+{t:"요리하다",d:"cuisiner",ex:"집에서 요리해요.",exf:"= Je cuisine à la maison.",ch:"Verbes essentiels",img:"👨‍🍳"},
+{t:"청소하다",d:"faire le ménage / nettoyer",ex:"방을 청소해요.",exf:"= Je nettoie la chambre.",ch:"Verbes essentiels",img:"🧹"},
+{t:"준비하다",d:"préparer",ex:"저녁을 준비해요.",exf:"= Je prépare le dîner.",ch:"Verbes essentiels",img:"🍳"},
+{t:"운동하다",d:"faire du sport",ex:"매일 운동해요.",exf:"= Je fais du sport tous les jours.",ch:"Verbes essentiels",img:"🏋️"},
+{t:"보다",d:"voir / regarder",ex:"영화를 봐요.",exf:"Je regarde un film.",ch:"Verbes essentiels",img:"👀"},
+{t:"듣다",d:"écouter (ㄷ irrég.)",ex:"음악을 들어요.",exf:"J'écoute de la musique.",ch:"Verbes essentiels",img:"👂"},
+{t:"말하다",d:"parler / dire",ex:"천천히 말해요.",exf:"Je parle lentement.",ch:"Verbes essentiels",img:"🗣️"},
+{t:"이야기하다",d:"parler / discuter",ex:"친구랑 이야기해요.",exf:"= Je discute avec un ami. (랑 = avec)",ch:"Verbes essentiels",img:"💬"},
+{t:"물어보다",d:"demander (une question)",ex:"선생님에게 물어봐요.",exf:"= Je demande au prof. (물어보다 → 물어봐요)",ch:"Verbes essentiels",img:"❓"},
+{t:"대답하다",d:"répondre",ex:"질문에 대답해요.",exf:"= Je réponds à la question.",ch:"Verbes essentiels",img:"🗨️"},
+{t:"전화하다",d:"téléphoner",ex:"친구에게 전화해요.",exf:"= J'appelle un ami. (에게 = à qqn)",ch:"Verbes essentiels",img:"📞"},
+{t:"소개하다",d:"présenter",ex:"친구를 소개해요.",exf:"= Je présente un ami. (자기소개 = se présenter)",ch:"Verbes essentiels",img:"🙋‍♂️"},
+{t:"부르다",d:"appeler / chanter",ex:"노래를 불러요.",exf:"= Je chante une chanson. (르 irrég. → 불러요)",ch:"Verbes essentiels",img:"📣"},
+{t:"읽다",d:"lire",ex:"책을 읽어요.",exf:"Je lis un livre.",ch:"Verbes essentiels",img:"📖"},
+{t:"쓰다",d:"écrire (으 irrég.)",ex:"편지를 써요.",exf:"J'écris une lettre.",ch:"Verbes essentiels",img:"✍️"},
+{t:"알다",d:"savoir / connaître",ex:"저는 그것을 알아요.",exf:"Je le sais.",ch:"Verbes essentiels",img:"💡"},
+{t:"모르다",d:"ne pas savoir (irrég.)",ex:"길을 몰라요.",exf:"Je ne connais pas le chemin.",ch:"Verbes essentiels",img:"🤷"},
+{t:"생각하다",d:"penser",ex:"가족을 생각해요.",exf:"Je pense à ma famille.",ch:"Verbes essentiels",img:"🤔"},
+{t:"기억하다",d:"se souvenir",ex:"이름을 기억해요.",exf:"= Je me souviens du nom.",ch:"Verbes essentiels",img:"💭"},
+{t:"잊어버리다",d:"oublier",ex:"약속을 잊어버렸어요.",exf:"= J'ai oublié le rendez-vous.",ch:"Verbes essentiels",img:"🌫️"},
+{t:"믿다",d:"croire / faire confiance",ex:"친구를 믿어요.",exf:"= Je fais confiance à mon ami.",ch:"Verbes essentiels",img:"🫶"},
+{t:"결정하다",d:"décider",ex:"빨리 결정해요.",exf:"= Je décide vite.",ch:"Verbes essentiels",img:"⚖️"},
+{t:"걱정하다",d:"s'inquiéter",ex:"걱정하지 마세요.",exf:"= Ne t'inquiète pas.",ch:"Verbes essentiels",img:"😟"},
+{t:"좋아하다",d:"aimer / apprécier",ex:"커피를 좋아해요.",exf:"J'aime le café.",ch:"Verbes essentiels",img:"👍"},
+{t:"싫어하다",d:"détester",ex:"벌레를 싫어해요.",exf:"Je déteste les insectes.",ch:"Verbes essentiels",img:"👎"},
+{t:"사랑하다",d:"aimer (d'amour)",ex:"가족을 사랑해요.",exf:"J'aime ma famille.",ch:"Verbes essentiels",img:"❤️"},
+{t:"원하다",d:"vouloir",ex:"무엇을 원해요?",exf:"Que voulez-vous ?",ch:"Verbes essentiels",img:"🙏"},
+{t:"만나다",d:"rencontrer",ex:"친구를 만나요.",exf:"Je rencontre un ami.",ch:"Verbes essentiels",img:"🤝"},
+{t:"놀다",d:"jouer / s'amuser",ex:"친구하고 놀아요.",exf:"Je m'amuse avec des amis.",ch:"Verbes essentiels",img:"🎉"},
+{t:"축하하다",d:"féliciter",ex:"생일 축하해요!",exf:"= Joyeux anniversaire !",ch:"Verbes essentiels",img:"🎊"},
+{t:"웃다",d:"rire / sourire",ex:"크게 웃어요.",exf:"Je ris fort.",ch:"Verbes essentiels",img:"😄"},
+{t:"울다",d:"pleurer",ex:"아기가 울어요.",exf:"Le bébé pleure.",ch:"Verbes essentiels",img:"😢"},
+{t:"주다",d:"donner",ex:"선물을 줘요.",exf:"Je donne un cadeau.",ch:"Verbes essentiels",img:"🎁"},
+{t:"받다",d:"recevoir",ex:"편지를 받았어요.",exf:"J'ai reçu une lettre.",ch:"Verbes essentiels",img:"📥"},
+{t:"사다",d:"acheter",ex:"옷을 사요.",exf:"J'achète des vêtements.",ch:"Verbes essentiels",img:"🛍️"},
+{t:"보내다",d:"envoyer / passer (du temps)",ex:"편지를 보내요.",exf:"= J'envoie une lettre.",ch:"Verbes essentiels",img:"📤"},
+{t:"찾다",d:"chercher / trouver",ex:"열쇠를 찾아요.",exf:"Je cherche mes clés.",ch:"Verbes essentiels",img:"🔍"},
+{t:"고르다",d:"choisir",ex:"선물을 골라요.",exf:"= Je choisis un cadeau. (르 irrég. → 골라요)",ch:"Verbes essentiels",img:"🎯"},
+{t:"사용하다",d:"utiliser",ex:"컴퓨터를 사용해요.",exf:"= J'utilise l'ordinateur.",ch:"Verbes essentiels",img:"🖥️"},
+{t:"놓다",d:"poser",ex:"책상에 놓아요.",exf:"= Je pose sur le bureau.",ch:"Verbes essentiels",img:"👇"},
+{t:"넣다",d:"mettre (dedans)",ex:"가방에 넣어요.",exf:"= Je mets dans le sac.",ch:"Verbes essentiels",img:"🎒"},
+{t:"만들다",d:"fabriquer / préparer",ex:"음식을 만들어요.",exf:"Je prépare à manger.",ch:"Verbes essentiels",img:"🔨"},
+{t:"바꾸다",d:"changer",ex:"계획을 바꿔요.",exf:"= Je change de plan. (바꾸다 → 바꿔요)",ch:"Verbes essentiels",img:"🔃"},
+{t:"열다",d:"ouvrir",ex:"창문을 열어요.",exf:"J'ouvre la fenêtre.",ch:"Verbes essentiels",img:"🔓"},
+{t:"닫다",d:"fermer",ex:"문을 닫아요.",exf:"Je ferme la porte.",ch:"Verbes essentiels",img:"🔒"},
+{t:"켜다",d:"allumer",ex:"불을 켜요.",exf:"= J'allume la lumière. (불 = lumière)",ch:"Verbes essentiels",img:"🔆"},
+{t:"끄다",d:"éteindre",ex:"불을 꺼요.",exf:"= J'éteins la lumière. (으 irrég. → 꺼요)",ch:"Verbes essentiels",img:"🌑"},
+{t:"입다",d:"porter (vêtement)",ex:"코트를 입어요.",exf:"Je mets un manteau.",ch:"Verbes essentiels",img:"👕"},
+{t:"벗다",d:"enlever (vêtement)",ex:"코트를 벗어요.",exf:"= J'enlève mon manteau. (↔ 입다)",ch:"Verbes essentiels",img:"🧥"},
+{t:"앉다",d:"s'asseoir",ex:"여기 앉으세요.",exf:"Asseyez-vous ici.",ch:"Verbes essentiels",img:"🪑"},
+{t:"살다",d:"vivre / habiter",ex:"서울에 살아요.",exf:"J'habite à Séoul.",ch:"Verbes essentiels",img:"🏠"},
+{t:"죽다",d:"mourir",ex:"꽃이 죽었어요.",exf:"La fleur est morte.",ch:"Verbes essentiels",img:"💀"},
+{t:"일하다",d:"travailler",ex:"회사에서 일해요.",exf:"Je travaille en entreprise.",ch:"Verbes essentiels",img:"💼"},
+{t:"공부하다",d:"étudier",ex:"한국어를 공부해요.",exf:"J'étudie le coréen.",ch:"Verbes essentiels",img:"✏️"},
+{t:"배우다",d:"apprendre",ex:"요리를 배워요.",exf:"J'apprends à cuisiner.",ch:"Verbes essentiels",img:"🧠"},
+{t:"시작하다",d:"commencer",ex:"수업을 시작해요.",exf:"Le cours commence.",ch:"Verbes essentiels",img:"▶️"},
+{t:"끝나다",d:"se terminer",ex:"수업이 끝났어요.",exf:"Le cours est fini.",ch:"Verbes essentiels",img:"🔚"},
+{t:"기다리다",d:"attendre",ex:"버스를 기다려요.",exf:"J'attends le bus.",ch:"Verbes essentiels",img:"⏳"},
+{t:"걸리다",d:"prendre (du temps) / attraper",ex:"시간이 걸려요.",exf:"= Ça prend du temps. (aussi : 감기에 걸리다 = attraper un rhume)",ch:"Verbes essentiels",img:"🕰️"},
+{t:"필요하다",d:"avoir besoin de",ex:"돈이 필요해요.",exf:"= J'ai besoin d'argent. (litt. « l'argent est nécessaire »)",ch:"Verbes essentiels",img:"🆘"},
+{t:"도와주다",d:"aider",ex:"친구를 도와줘요.",exf:"= J'aide mon ami. (도와주다 → 도와줘요)",ch:"Verbes essentiels",img:"🙌"},
+{t:"지내다",d:"aller / se porter",ex:"요즘 잘 지내요.",exf:"= Ces temps-ci ça va bien. (인사 : 잘 지내요? = Ça va ?)",ch:"Verbes essentiels",img:"😊"},
+{t:"찍다",d:"prendre (une photo)",ex:"사진을 찍어요.",exf:"= Je prends une photo.",ch:"Verbes essentiels",img:"📸"},
 ];
 
 // ============ APP STATE ============
@@ -432,13 +622,18 @@ let showingWrongOnly = false;
 
 // ---- Persistent mastery (survives across sessions) ----
 const STORE_KEY = "kf_mastered_v1";
+const STORE_KEY_WRONG = "kf_notknown_v1";
 let mastered = new Set();
+let notKnown = new Set();   // ratées persistantes (par mot .t)
 function loadMastered(){
   try{ const raw = localStorage.getItem(STORE_KEY); if(raw) mastered = new Set(JSON.parse(raw)); }
   catch(e){ mastered = new Set(); }
+  try{ const raw2 = localStorage.getItem(STORE_KEY_WRONG); if(raw2) notKnown = new Set(JSON.parse(raw2)); }
+  catch(e){ notKnown = new Set(); }
 }
 function saveMastered(){
   try{ localStorage.setItem(STORE_KEY, JSON.stringify([...mastered])); }catch(e){}
+  try{ localStorage.setItem(STORE_KEY_WRONG, JSON.stringify([...notKnown])); }catch(e){}
 }
 loadMastered();
 
@@ -487,6 +682,9 @@ function render(){
   const area = document.getElementById("cardArea");
   const total = deck.length;
   document.getElementById("topcount").textContent = `${total} cartes`;
+  // libellé "Ratées (n)" toujours à jour
+  const wl = document.getElementById("wrongLabel");
+  if(wl) wl.textContent = notKnown.size ? `Ratées (${notKnown.size})` : "Ratées";
   // progress bar = % MAÎTRISÉ de la section courante (persistant dans le temps)
   const secCards = (activeFilter==="Tout") ? allCards : allCards.filter(c=>c.ch===activeFilter);
   const secMastered = secCards.filter(c=>mastered.has(c.t)).length;
@@ -496,10 +694,11 @@ function render(){
 
   if(idx >= deck.length){
     // done
+    const totalWrong = notKnown.size;
     area.innerHTML = `<div class="done">
       <h2>🎉 Terminé !</h2>
-      <p>✅ Connues : ${known.size} &nbsp;·&nbsp; ❌ À revoir : ${wrong.size}</p>
-      ${wrong.size ? `<button onclick="reviewWrong()">Revoir les ${wrong.size} ratées</button>` : `<button onclick="buildDeck()">Recommencer</button>`}
+      <p>✅ Connues : ${known.size} &nbsp;·&nbsp; ✗ À revoir : ${wrong.size}</p>
+      ${totalWrong ? `<button onclick="reviewWrong()">Revoir mes ratées (${totalWrong})</button>` : `<button onclick="buildDeck()">Recommencer</button>`}
     </div>`;
     document.getElementById("controls").style.visibility="hidden";
     return;
@@ -517,6 +716,7 @@ function render(){
           <div class="front-hint">Clique pour retourner</div>
         </div>
         <div class="face back">
+          <div class="back-emoji">${c.img||'📚'}</div>
           <div class="back-fr">${esc(c.d)}</div>
           <div class="back-ex"><b class="kr">${esc(c.ex)}</b><br>${esc(c.exf)}</div>
         </div>
@@ -540,20 +740,32 @@ function prev(){
 }
 function markKnow(){
   const c = deck[idx];
-  if(c){ mastered.add(c.t); saveMastered(); }
+  if(c){ mastered.add(c.t); notKnown.delete(c.t); saveMastered(); }
   known.add(idx); wrong.delete(idx);
   renderFilters();
   next();
 }
 function markDontKnow(){
   const c = deck[idx];
-  if(c){ mastered.delete(c.t); saveMastered(); }
+  if(c){ notKnown.add(c.t); mastered.delete(c.t); saveMastered(); }
   wrong.add(idx); known.delete(idx);
   renderFilters();
   next();
 }
 function reviewWrong(){
-  const wrongCards = [...wrong].map(i=>deck[i]);
+  // Ratées PERSISTANTES : toutes les cartes marquées "je ne sais pas", tous chapitres, à tout moment
+  const wrongCards = DATA.filter(c => notKnown.has(c.t));
+  if(wrongCards.length === 0){
+    const area = document.getElementById("cardArea");
+    area.innerHTML = `<div class="done">
+      <h2>🎯 Aucune ratée !</h2>
+      <p>Tu n'as aucune carte à revoir pour le moment.<br>Les cartes marquées « je ne sais pas » ✗ apparaîtront ici.</p>
+      <button onclick="document.getElementById('bReset').click()">Retour aux cartes</button>
+    </div>`;
+    document.getElementById("controls").style.visibility="hidden";
+    document.getElementById("bOnlyWrong").classList.add("active-mode");
+    return;
+  }
   deck = wrongCards;
   idx=0; flipped=false; known=new Set(); wrong=new Set();
   showingWrongOnly=true;
@@ -598,7 +810,7 @@ document.getElementById("panelClose").onclick = closeProgress;
 document.getElementById("overlay").onclick = (e)=>{ if(e.target.id==="overlay") closeProgress(); };
 document.getElementById("panelReset").onclick = ()=>{
   if(confirm("Effacer toute ta progression ? Cette action est irréversible.")){
-    mastered = new Set(); saveMastered(); renderProgress(); renderFilters(); render();
+    mastered = new Set(); notKnown = new Set(); saveMastered(); renderProgress(); renderFilters(); render();
   }
 };
 
