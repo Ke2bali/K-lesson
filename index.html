@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Korean Flashcards · 156 cartes</title>
+<title>Korean Flash · 351 cartes</title>
 <style>
 :root{
   --bg1:#EEF0FF;--bg2:#F7F1FF;
@@ -198,6 +198,43 @@ body{
 .panel-reset{margin-top:24px;width:100%;border:1.5px solid var(--line);background:transparent;color:var(--muted);
   padding:12px;border-radius:14px;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .15s}
 .panel-reset:hover{border-color:var(--rose);color:var(--rose);background:var(--rose-soft)}
+
+/* --- cartes à écrire --- */
+.writecard{background:var(--card);border:2px solid var(--line);border-radius:var(--r,20px);padding:26px 22px;width:100%;max-width:460px;position:relative;box-shadow:var(--shadow)}
+.write-top{display:flex;justify-content:space-between;margin-bottom:14px}
+.write-tag{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#a15c00;background:#FFF3E0;padding:5px 11px;border-radius:99px;margin-bottom:14px}
+.write-fr{font-size:1.35rem;font-weight:700;margin-bottom:18px;line-height:1.3}
+.write-input{width:100%;font-size:1.5rem;padding:13px 15px;border:2px solid var(--line);border-radius:14px;outline:none;text-align:center;background:#fff;font-family:inherit}
+.write-input:focus{border-color:var(--accent2,#4C4FEE)}
+.write-input.good{border-color:#2E7D5B;background:#E4F5EC}
+.write-input.bad{border-color:#C2453B;background:#FDECEA}
+.write-btn{margin-top:14px;width:100%;border:none;background:var(--accent2,#4C4FEE);color:#fff;font-weight:700;font-size:1rem;padding:13px;border-radius:13px;cursor:pointer;font-family:inherit}
+.write-fb{margin-top:13px;text-align:center;font-size:.95rem;min-height:24px}
+.wok{color:#2E7D5B;font-weight:700}
+.wko{color:#C2453B;font-weight:600}
+.write-skip{margin-top:10px;width:100%;background:transparent;border:1.5px solid var(--line);color:var(--muted,#888);padding:10px;border-radius:12px;cursor:pointer;font-family:inherit;font-size:.85rem}
+
+/* --- QCM grammaire --- */
+.gcard{background:var(--card);border:2px solid var(--line);border-radius:var(--r,20px);padding:24px 22px;width:100%;max-width:520px;box-shadow:var(--shadow)}
+.gq{font-size:1.15rem;font-weight:700;line-height:1.4;margin:6px 0 18px}
+.gopts{display:flex;flex-direction:column;gap:10px}
+.gopt{text-align:left;background:#fff;border:2px solid var(--line);border-radius:13px;padding:14px 16px;font-size:1.05rem;cursor:pointer;font-family:inherit;transition:all .15s}
+.gopt:hover:not(:disabled){border-color:var(--accent2,#4C4FEE)}
+.gopt.gok{background:#E4F5EC;border-color:#2E7D5B;color:#2E7D5B;font-weight:700}
+.gopt.gko{background:#FDECEA;border-color:#C2453B;color:#C2453B}
+.gfb{margin-top:16px}
+.gfb-in{background:var(--bg,#F5F0E8);border-radius:13px;padding:13px 15px;font-size:.92rem;line-height:1.5;margin-bottom:12px}
+
+/* --- ratées par catégorie (panneau) --- */
+.prow-foot{margin-top:7px}
+.prow-wrong{background:#FDECEA;border:1.5px solid #f3c3bd;color:#C2453B;font-weight:700;font-size:.78rem;padding:6px 12px;border-radius:99px;cursor:pointer;font-family:inherit}
+.prow-wrong:hover{background:#C2453B;color:#fff;border-color:#C2453B}
+.prow-clean{font-size:.78rem;color:#2E7D5B;font-weight:600}
+
+/* correction position en-têtes cartes écriture/QCM */
+.writecard,.gcard{position:relative}
+.write-top{position:static;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.write-top .front-chap,.write-top .front-num{position:static!important;top:auto!important;left:auto!important;right:auto!important}
 </style>
 <meta name="theme-color" content="#4C4FEE">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -234,6 +271,7 @@ body{
   <button class="bbtn" id="bShuffle"><span class="bico">🎲</span>Mélanger</button>
   <button class="bbtn" id="bReset"><span class="bico">♻️</span>Recommencer</button>
   <button class="bbtn" id="bOnlyWrong"><span class="bico">🎯</span><span id="wrongLabel">Ratées</span></button>
+  <button class="bbtn" id="bWrite"><span class="bico">✍️</span><span id="writeLabel">Écriture : off</span></button>
 </div>
 
 <div class="spacer"></div>
@@ -387,7 +425,7 @@ const DATA=[
 {t:"배탈",d:"Maux d'estomac",ex:"매운 음식을 먹어서 배탈이 났어요.",exf:"J'ai mal au ventre car j'ai mangé épicé.",ch:"Ch.7 Santé",img:"🤢"},
 {t:"재채기",d:"L'éternuement",ex:"봄에 재채기가 나요.",exf:"J'éternue au printemps.",ch:"Ch.7 Santé",img:"🤧"},
 {t:"콧물",d:"Nez qui coule",ex:"감기에 걸려서 콧물이 나와요.",exf:"J'ai le nez qui coule.",ch:"Ch.7 Santé",img:"👃"},
-{t:"열",d:"La fièvre",ex:"몸에서 열이 나요.",exf:"J'ai de la fièvre.",ch:"Ch.7 Santé",img:"🤒"},
+{t:"열 (santé)",d:"La fièvre",ex:"몸에서 열이 나요.",exf:"J'ai de la fièvre.",ch:"Ch.7 Santé",img:"🤒"},
 {t:"치료",d:"Le traitement",ex:"의사 선생님이 치료해 주실 거예요.",exf:"Le médecin vous soignera.",ch:"Ch.7 Santé",img:"🩹"},
 {t:"감기약",d:"Médicament contre le rhume",ex:"약국에서 감기약을 사요.",exf:"J'achète un médicament à la pharmacie.",ch:"Ch.7 Santé",img:"💊"},
 {t:"소화제",d:"Médicament digestif",ex:"소화가 안 돼서 소화제를 먹었어요.",exf:"J'ai pris un digestif.",ch:"Ch.7 Santé",img:"💊"},
@@ -410,7 +448,7 @@ const DATA=[
 // Ch10 Vie scolaire (13)
 {t:"교환 학생",d:"Étudiant d'échange",ex:"교환 학생으로 한국에 가요.",exf:"Je pars en Corée comme étudiant d'échange.",ch:"Ch.10 Vie scolaire",img:"🧑‍🎓"},
 {t:"전공",d:"Spécialité / filière",ex:"전공이 뭐예요?",exf:"Quelle est votre spécialité ?",ch:"Ch.10 Vie scolaire",img:"📚"},
-{t:"대학원",d:"École doctorale",ex:"졸업 후에 대학원을 갈 거예요.",exf:"J'irai en école doctorale après le diplôme.",ch:"Ch.10 Vie scolaire",img:"🎓"},
+{t:"대학원",d:"École doctorale",ex:"졸업 후에 대학원에 갈 거예요.",exf:"J'irai en école doctorale après le diplôme.",ch:"Ch.10 Vie scolaire",img:"🎓"},
 {t:"학기",d:"Le semestre",ex:"새 학기를 시작했어요.",exf:"Le nouveau semestre a commencé.",ch:"Ch.10 Vie scolaire",img:"🗓️"},
 {t:"학년",d:"Année scolaire",ex:"벌써 2학년이 돼요.",exf:"Je passe en deuxième année.",ch:"Ch.10 Vie scolaire",img:"📅"},
 {t:"출석하다",d:"Assister au cours",ex:"날마다 수업에 출석해요.",exf:"J'assiste au cours tous les jours.",ch:"Ch.10 Vie scolaire",img:"🙋"},
@@ -434,7 +472,7 @@ const DATA=[
 {t:"년 + 월 + 일 + 요일",d:"L'ordre d'une date",ex:"2025년 3월 5일 수요일",exf:"Du plus grand au plus petit : [année]년 [mois]월 [jour]일 [nom]요일",ch:"🕐 Date & heure",img:"📆"},
 {t:"년",d:"L'année (date)",ex:"2025년",exf:"Sino + 년 (이천이십오 년)",ch:"🕐 Date & heure",img:"📅"},
 {t:"월",d:"Le mois",ex:"삼월 = mars",exf:"Sino + 월 (일월, 이월, 삼월…)",ch:"🕐 Date & heure",img:"🗓️"},
-{t:"일",d:"Le jour (date)",ex:"오 일 = le 5",exf:"Sino + 일",ch:"🕐 Date & heure",img:"📆"},
+{t:"일 (date)",d:"Le jour (date)",ex:"오 일 = le 5",exf:"Sino + 일",ch:"🕐 Date & heure",img:"📆"},
 {t:"몇 시예요?",d:"Quelle heure est-il ?",ex:"지금 몇 시예요?",exf:"= Il est quelle heure maintenant ?",ch:"🕐 Date & heure",img:"🕐"},
 {t:"시",d:"L'heure (h)",ex:"세 시 = 3h",exf:"Chiffre NATIF + 시",ch:"🕐 Date & heure",img:"🕒"},
 {t:"분",d:"La minute",ex:"삼십 분 = 30 min",exf:"Chiffre SINO + 분",ch:"🕐 Date & heure",img:"⏱️"},
@@ -493,7 +531,7 @@ const DATA=[
 {t:"일곱",d:"7 · sept",ex:"일곱 개",exf:"Natif · pour compter",ch:"🔢 Nombres natifs",img:"7️⃣"},
 {t:"여덟",d:"8 · huit",ex:"여덟 개",exf:"Natif · pour compter",ch:"🔢 Nombres natifs",img:"8️⃣"},
 {t:"아홉",d:"9 · neuf",ex:"아홉 개",exf:"Natif · pour compter",ch:"🔢 Nombres natifs",img:"9️⃣"},
-{t:"열",d:"10 · dix",ex:"열 개",exf:"Natif · pour compter",ch:"🔢 Nombres natifs",img:"🔟"},
+{t:"열 (nombre)",d:"10 · dix",ex:"열 개",exf:"Natif · pour compter",ch:"🔢 Nombres natifs",img:"🔟"},
 {t:"스물",d:"20 · vingt",ex:"스물 살",exf:"Natif · âge (스물→스무 devant compteur)",ch:"🔢 Nombres natifs",img:"🔢"},
 {t:"서른",d:"30 · trente",ex:"서른 살",exf:"Natif · âge",ch:"🔢 Nombres natifs",img:"🔢"},
 {t:"마흔",d:"40 · quarante",ex:"마흔 살",exf:"Natif · âge",ch:"🔢 Nombres natifs",img:"🔢"},
@@ -505,7 +543,7 @@ const DATA=[
 {t:"열하나",d:"11 · construction",ex:"열 + 하나",exf:"[dizaine] + [unité]. Ex : 열한 살 = 11 ans",ch:"🔢 Nombres natifs",img:"🧩"},
 {t:"스물다섯",d:"25 · construction",ex:"스물 + 다섯",exf:"20 + 5 → 스물다섯 살 = 25 ans",ch:"🔢 Nombres natifs",img:"🧩"},
 // Nombres sino (18)
-{t:"일",d:"1 · un",ex:"일 월",exf:"Sino · dates, argent, minutes (janvier)",ch:"🔟 Nombres sino",img:"1️⃣"},
+{t:"일 (nombre)",d:"1 · un",ex:"일 월",exf:"Sino · dates, argent, minutes (janvier)",ch:"🔟 Nombres sino",img:"1️⃣"},
 {t:"이",d:"2 · deux",ex:"이 월",exf:"Sino (février)",ch:"🔟 Nombres sino",img:"2️⃣"},
 {t:"삼",d:"3 · trois",ex:"삼 월",exf:"Sino (mars)",ch:"🔟 Nombres sino",img:"3️⃣"},
 {t:"사",d:"4 · quatre",ex:"사 월",exf:"Sino (avril)",ch:"🔟 Nombres sino",img:"4️⃣"},
@@ -609,6 +647,53 @@ const DATA=[
 {t:"도와주다",d:"aider",ex:"친구를 도와줘요.",exf:"= J'aide mon ami. (도와주다 → 도와줘요)",ch:"Verbes essentiels",img:"🙌"},
 {t:"지내다",d:"aller / se porter",ex:"요즘 잘 지내요.",exf:"= Ces temps-ci ça va bien. (인사 : 잘 지내요? = Ça va ?)",ch:"Verbes essentiels",img:"😊"},
 {t:"찍다",d:"prendre (une photo)",ex:"사진을 찍어요.",exf:"= Je prends une photo.",ch:"Verbes essentiels",img:"📸"},
+{t:"기차역",d:"La gare (train)",ex:"기차역에서 만나요.",exf:"On se retrouve à la gare.",ch:"🚉 Transports",img:"🚉"},
+{t:"기차",d:"Le train",ex:"기차를 타고 부산에 가요.",exf:"Je vais à Busan en train.",ch:"🚉 Transports",img:"🚆"},
+{t:"지하철",d:"Le métro",ex:"지하철이 제일 빨라요.",exf:"Le métro est le plus rapide.",ch:"🚉 Transports",img:"🚇"},
+{t:"공항",d:"L'aéroport",ex:"공항까지 두 시간 걸려요.",exf:"Il faut deux heures jusqu'à l'aéroport.",ch:"🚉 Transports",img:"✈️"},
+{t:"비행기",d:"L'avion",ex:"비행기가 곧 출발해요.",exf:"L'avion part bientôt.",ch:"🚉 Transports",img:"🛫"},
+{t:"버스",d:"Le bus",ex:"버스를 기다리고 있어요.",exf:"J'attends le bus.",ch:"🚉 Transports",img:"🚌"},
+{t:"버스 정류장",d:"L'arrêt de bus",ex:"버스 정류장이 어디예요?",exf:"Où est l'arrêt de bus ?",ch:"🚉 Transports",img:"🚏"},
+{t:"배",d:"Le bateau",ex:"배를 타고 제주도에 가요.",exf:"Je vais à Jeju en bateau.",ch:"🚉 Transports",img:"🚢"},
+{t:"항구",d:"Le port",ex:"항구에서 배를 기다려요.",exf:"J'attends le bateau au port.",ch:"🚉 Transports",img:"⚓"},
+{t:"택시",d:"Le taxi",ex:"택시를 탈까요?",exf:"On prend un taxi ?",ch:"🚉 Transports",img:"🚕"},
+{t:"표",d:"Le billet / ticket",ex:"표 두 장 주세요.",exf:"Deux billets, s'il vous plaît.",ch:"🚉 Transports",img:"🎫"},
+{t:"편도",d:"Aller simple",ex:"편도로 주세요.",exf:"Un aller simple, s'il vous plaît.",ch:"🚉 Transports",img:"➡️"},
+{t:"왕복",d:"Aller-retour",ex:"왕복 표가 더 싸요.",exf:"Le billet aller-retour est moins cher.",ch:"🚉 Transports",img:"🔁"},
+{t:"예매하다",d:"Réserver (un billet)",ex:"인터넷으로 표를 예매했어요.",exf:"J'ai réservé le billet sur internet.",ch:"🚉 Transports",img:"💻"},
+{t:"갈아타다",d:"Changer / faire une correspondance",ex:"서울역에서 갈아타세요.",exf:"Changez à la gare de Séoul.",ch:"🚉 Transports",img:"🔄"},
+{t:"늦다",d:"Être en retard",ex:"기차가 늦었어요.",exf:"Le train a eu du retard.",ch:"🚉 Transports",img:"⏰"},
+{t:"짐",d:"Les bagages",ex:"짐이 너무 무거워요.",exf:"Les bagages sont trop lourds.",ch:"🚉 Transports",img:"🧳"},
+];
+
+
+// ============ QCM GRAMMAIRE ============
+const GRAMMAR=[
+{q:"Il pleut vraiment beaucoup ! (constat, sur le vif)",o:["비가 많이 오네요","비가 많이 오겠어요","비가 많이 올게요"],a:0,ex:"-네요 = réaction spontanée à ce qu'on découvre."},
+{q:"Vous devez être fatigué(e). (supposition)",o:["피곤하네요","피곤하겠어요","피곤할게요"],a:1,ex:"-겠- = supposition, déduction logique."},
+{q:"Essayez donc ce vêtement.",o:["입으세요","입어 보세요","입을게요"],a:1,ex:"-어/아 보다 = essayer, tenter."},
+{q:"J'ai reçu une lettre de mon ami. (oral)",o:["친구한테서 편지가 왔어요","친구에게 편지가 왔어요","친구로 편지가 왔어요"],a:0,ex:"한테서 = source (oral) ; 에게서 = écrit."},
+{q:"« une grande maison »",o:["크는 집","큰 집","크은 집"],a:1,ex:"Adjectif + -은/-ㄴ devant le nom ; 크다 → 큰."},
+{q:"« la personne qui lit un livre »",o:["책을 읽은 사람","책을 읽는 사람","책을 읽을 사람"],a:1,ex:"Verbe + -는 = action en cours."},
+{q:"J'ai offert un cadeau au professeur. (respect)",o:["선생님에게 드렸어요","선생님께 드렸어요","선생님한테 드렸어요"],a:1,ex:"께 = forme honorifique de 에게/한테."},
+{q:"Je vais au supermarché, tu as besoin de quelque chose ?",o:["마트에 가는데 뭐 필요해요?","마트에 가고 뭐 필요해요?","마트에 가서 뭐 필요해요?"],a:0,ex:"-는데 ① = poser le contexte avant la suite."},
+{q:"« Et si on cuisinait du bulgogi ? »",o:["불고기를 해 먹는 거 어때요?","불고기를 해 먹었어요","불고기를 해 먹네요"],a:0,ex:"-는 것/거 = transforme l'action en nom."},
+{q:"C'est moi qui paie. (intention)",o:["제가 계산해요","제가 계산할게요","제가 계산하겠네요"],a:1,ex:"-을게요 = intention/promesse, 1re personne."},
+{q:"La lecture du coréen est difficile.",o:["한국어 읽는 게 어려워요","한국어 읽기가 어려워요","둘 다 맞아요 (les deux)"],a:2,ex:"-기 et -는 것 nominalisent tous deux ; -기 est fréquent avec 어렵다/쉽다."},
+{q:"Je suis déjà allé(e) à Jeju.",o:["제주도에 간 적이 있어요","제주도에 가는 적이 있어요","제주도에 갈 적이 있어요"],a:0,ex:"-(으)ㄴ 적이 있다 = expérience déjà vécue."},
+{q:"J'ai décidé d'aller à Busan.",o:["부산에 가려고 했어요","부산에 가기로 했어요","부산에 갈 수 있어요"],a:1,ex:"-기로 하다 = décision prise."},
+{q:"Parlez fort, s'il vous plaît.",o:["크게 말해 주세요","큰 말해 주세요","크고 말해 주세요"],a:0,ex:"Adjectif + -게 = adverbe (« -ment »)."},
+{q:"Ne mangez pas d'aliments froids.",o:["찬 음식을 안 먹어요","찬 음식을 먹지 마세요","찬 음식을 못 먹어요"],a:1,ex:"-지 마세요 = interdiction."},
+{q:"Tu veux voir un film ? (entre amis)",o:["영화 볼래요?","영화 보겠어요?","영화 보네요?"],a:0,ex:"-(으)ㄹ래요 = volonté / proposition décontractée."},
+{q:"Il n'y a que deux places.",o:["자리가 두 개밖에 있어요","자리가 두 개밖에 없어요","자리가 두 개만 없어요"],a:1,ex:"밖에 est TOUJOURS suivi d'une négation."},
+{q:"J'aime le sport, mais je n'ai pas le temps.",o:["운동을 좋아하는데 시간이 없어요","운동을 좋아해서 시간이 없어요","운동을 좋아하고 시간이 없어요"],a:0,ex:"-는데 ② = opposition (« mais »)."},
+{q:"Je vais à la montagne chaque week-end.",o:["주말에 산에 가요","주말마다 산에 가요","주말까지 산에 가요"],a:1,ex:"마다 = chaque, tous les…"},
+{q:"« Rester silencieux après 22h » (règlement)",o:["조용히 하세요","조용히 할 것","조용히 할래요"],a:1,ex:"-(으)ㄹ 것 = consigne impersonnelle de règlement."},
+{q:"Comme il n'y avait pas de bus, je n'ai pu que prendre un taxi.",o:["택시를 탈 수 있었어요","택시를 탈 수밖에 없었어요","택시를 타면 안 됐어요"],a:1,ex:"-(으)ㄹ 수밖에 없다 = pas d'autre choix."},
+{q:"Quelle particule ? « 학교___ 가요 » (aller à l'école)",o:["를","에","에서"],a:1,ex:"에 = destination avec un verbe de mouvement."},
+{q:"Quelle particule ? « 카페___ 친구를 만나요 »",o:["에","에서","로"],a:1,ex:"에서 = lieu où se déroule l'action."},
+{q:"« 밥___ 먹어요 » : quelle particule objet ?",o:["을","를","이"],a:0,ex:"밥 finit par une consonne (batchim) → 을."},
+{q:"« 커피___ 마셔요 » : quelle particule objet ?",o:["을","를","가"],a:1,ex:"커피 finit par une voyelle → 를."},
 ];
 
 // ============ APP STATE ============
@@ -619,6 +704,9 @@ let flipped = false;
 let known = new Set();
 let wrong = new Set();
 let showingWrongOnly = false;
+let writeRatio = 0;          // proportion de cartes "à écrire" injectées
+let grammarMode = false;     // mode QCM grammaire
+let gIdx = 0, gAnswered = false, gScore = 0;
 
 // ---- Persistent mastery (survives across sessions) ----
 const STORE_KEY = "kf_mastered_v1";
@@ -646,6 +734,10 @@ function pctOf(ch){
   const m = cards.filter(c=>mastered.has(c.t)).length;
   return cards.length ? Math.round(m/cards.length*100) : 0;
 }
+function wrongCountOf(ch){
+  const cards = (ch==="Tout") ? DATA : DATA.filter(c=>c.ch===ch);
+  return cards.filter(c=>notKnown.has(c.t)).length;
+}
 function renderFilters(){
   const el = document.getElementById("filterSelect");
   let html = `<option value="Tout" ${activeFilter==="Tout"?"selected":""}>Tout (${DATA.length}) · ${pctOf("Tout")}%</option>`;
@@ -654,6 +746,7 @@ function renderFilters(){
     const short = ch.replace(/^Ch\.\d+\s*/,"").replace("Verbes essentiels","🔥 Verbes");
     html += `<option value="${ch}" ${activeFilter===ch?"selected":""}>${short} (${n}) · ${pctOf(ch)}%</option>`;
   }
+  html += `<option value="__GRAMMAR__" ${activeFilter==="__GRAMMAR__"?"selected":""}>📘 Grammaire QCM (${GRAMMAR.length})</option>`;
   el.innerHTML = html;
   el.onchange = ()=>{
     activeFilter = el.value;
@@ -666,13 +759,47 @@ function renderFilters(){
 
 // ============ DECK ============
 function buildDeck(){
+  grammarMode = (activeFilter==="__GRAMMAR__");
+  if(grammarMode){ gIdx=0; gAnswered=false; gScore=0; renderGrammar(); renderFilters(); return; }
   if(activeFilter==="Tout") deck = allCards.slice();
   else deck = allCards.filter(c=>c.ch===activeFilter);
+  deck = deck.map(c=>({...c}));          // clone pour ne pas modifier DATA
+  applyWriteMode();
   known = new Set();
   wrong = new Set();
   idx = 0;
   flipped = false;
   render();
+}
+
+// --- Cartes "à écrire" : injectées au hasard (jamais sur la section Verbes) ---
+function applyWriteMode(){
+  deck.forEach(c=>{ delete c.write; });
+  if(writeRatio<=0) return;
+  const eligible = deck.filter(c=> c.ch!=="Verbes essentiels");
+  if(!eligible.length) return;
+  const n = Math.max(1, Math.round(eligible.length*writeRatio));
+  const pool = eligible.slice();
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  pool.slice(0,n).forEach(c=>{ c.write = true; });
+}
+function norm(s){ return (s||"").replace(/\s+/g,"").replace(/[.,!?·]/g,"").trim(); }
+function baseTerm(t){ return norm(t).replace(/\(.*?\)/g,""); }
+function checkWrite(){
+  const inp = document.getElementById("writeInput");
+  if(!inp) return;
+  const c = deck[idx];
+  const ok = baseTerm(inp.value) === baseTerm(c.t);
+  const fb = document.getElementById("writeFb");
+  if(ok){
+    fb.innerHTML = `<span class="wok">✓ Correct !</span>`;
+    inp.classList.add("good");
+    setTimeout(()=>{ markKnow(); }, 700);
+  } else {
+    fb.innerHTML = `<span class="wko">✗ La réponse était <b class="kr">${esc(c.t)}</b></span>`;
+    inp.classList.add("bad");
+    setTimeout(()=>{ markDontKnow(); }, 1600);
+  }
 }
 
 function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}return arr}
@@ -684,7 +811,7 @@ function render(){
   document.getElementById("topcount").textContent = `${total} cartes`;
   // libellé "Ratées (n)" toujours à jour
   const wl = document.getElementById("wrongLabel");
-  if(wl) wl.textContent = notKnown.size ? `Ratées (${notKnown.size})` : "Ratées";
+  if(wl){ const wc = wrongCountOf(activeFilter==="__GRAMMAR__"?"Tout":activeFilter); wl.textContent = wc ? `Ratées (${wc})` : "Ratées"; }
   // progress bar = % MAÎTRISÉ de la section courante (persistant dans le temps)
   const secCards = (activeFilter==="Tout") ? allCards : allCards.filter(c=>c.ch===activeFilter);
   const secMastered = secCards.filter(c=>mastered.has(c.t)).length;
@@ -705,6 +832,22 @@ function render(){
   }
   document.getElementById("controls").style.visibility="visible";
   const c = deck[idx];
+  if(c.write){
+    area.innerHTML = `
+      <div class="writecard">
+        <div class="write-top"><span class="front-chap">${esc(c.ch)}</span><span class="front-num">${idx+1}/${total}</span></div>
+        <div class="write-tag">✍️ Écris en coréen</div>
+        <div class="write-fr">${esc(c.d)}</div>
+        <input id="writeInput" class="write-input kr" type="text" autocomplete="off" autocapitalize="off"
+               autocorrect="off" spellcheck="false" placeholder="한국어로 쓰세요..." />
+        <button class="write-btn" onclick="checkWrite()">Vérifier</button>
+        <div class="write-fb" id="writeFb"></div>
+        <button class="write-skip" onclick="revealWrite()">Je ne sais pas</button>
+      </div>`;
+    const wi = document.getElementById("writeInput");
+    if(wi){ wi.focus(); wi.onkeydown = (e)=>{ if(e.key==="Enter"){ e.preventDefault(); checkWrite(); } }; }
+    return;
+  }
   area.innerHTML = `
     <div class="perspective" id="cardFlip" onclick="flipCard()">
       <div class="flipper ${flipped?'flipped':''}" id="flipper">
@@ -752,21 +895,72 @@ function markDontKnow(){
   renderFilters();
   next();
 }
+function revealWrite(){
+  const c = deck[idx];
+  const fb = document.getElementById("writeFb");
+  if(fb) fb.innerHTML = `<span class="wko">La réponse : <b class="kr">${esc(c.t)}</b></span>`;
+  setTimeout(()=>{ markDontKnow(); }, 1400);
+}
+
+// ============ QCM GRAMMAIRE ============
+function renderGrammar(){
+  const area = document.getElementById("cardArea");
+  document.getElementById("controls").style.visibility="hidden";
+  document.getElementById("topcount").textContent = `${GRAMMAR.length} questions`;
+  const pct = Math.round(gIdx/GRAMMAR.length*100);
+  document.getElementById("pfill").style.width = pct+"%";
+  document.getElementById("plabel").textContent = `Score ${gScore}/${GRAMMAR.length}`;
+  if(gIdx >= GRAMMAR.length){
+    area.innerHTML = `<div class="done">
+      <h2>📘 QCM terminé !</h2>
+      <p>Score : <b>${gScore} / ${GRAMMAR.length}</b></p>
+      <button onclick="gIdx=0;gScore=0;gAnswered=false;renderGrammar()">Recommencer le QCM</button>
+    </div>`;
+    return;
+  }
+  const g = GRAMMAR[gIdx];
+  area.innerHTML = `
+    <div class="gcard">
+      <div class="write-top"><span class="front-chap">📘 Grammaire</span><span class="front-num">${gIdx+1}/${GRAMMAR.length}</span></div>
+      <div class="gq">${esc(g.q)}</div>
+      <div class="gopts" id="gopts">
+        ${g.o.map((o,i)=>`<button class="gopt kr" data-i="${i}" onclick="answerGrammar(${i})">${esc(o)}</button>`).join("")}
+      </div>
+      <div class="gfb" id="gfb"></div>
+    </div>`;
+}
+function answerGrammar(i){
+  if(gAnswered) return;
+  gAnswered = true;
+  const g = GRAMMAR[gIdx];
+  const btns = document.querySelectorAll("#gopts .gopt");
+  btns.forEach((b,bi)=>{
+    if(bi===g.a) b.classList.add("gok");
+    else if(bi===i) b.classList.add("gko");
+    b.disabled = true;
+  });
+  if(i===g.a) gScore++;
+  document.getElementById("gfb").innerHTML =
+    `<div class="gfb-in">${i===g.a?'<b class="wok">✓ Bravo !</b>':'<b class="wko">✗ Pas tout à fait.</b>'} ${esc(g.ex)}</div>
+     <button class="write-btn" onclick="gIdx++;gAnswered=false;renderGrammar()">Question suivante →</button>`;
+}
+
 function reviewWrong(){
-  // Ratées PERSISTANTES : toutes les cartes marquées "je ne sais pas", tous chapitres, à tout moment
-  const wrongCards = DATA.filter(c => notKnown.has(c.t));
+  // Ratées : filtrées selon la catégorie sélectionnée (ou toutes si "Tout")
+  const scope = (activeFilter==="Tout"||activeFilter==="__GRAMMAR__") ? DATA : DATA.filter(c=>c.ch===activeFilter);
+  const wrongCards = scope.filter(c => notKnown.has(c.t));
   if(wrongCards.length === 0){
     const area = document.getElementById("cardArea");
     area.innerHTML = `<div class="done">
       <h2>🎯 Aucune ratée !</h2>
-      <p>Tu n'as aucune carte à revoir pour le moment.<br>Les cartes marquées « je ne sais pas » ✗ apparaîtront ici.</p>
+      <p>Aucune carte à revoir ${activeFilter==="Tout"?"":"dans cette catégorie"}.<br>Les cartes marquées « je ne sais pas » ✗ apparaîtront ici.</p>
       <button onclick="document.getElementById('bReset').click()">Retour aux cartes</button>
     </div>`;
     document.getElementById("controls").style.visibility="hidden";
     document.getElementById("bOnlyWrong").classList.add("active-mode");
     return;
   }
-  deck = wrongCards;
+  deck = wrongCards.map(c=>({...c}));
   idx=0; flipped=false; known=new Set(); wrong=new Set();
   showingWrongOnly=true;
   document.getElementById("bOnlyWrong").classList.add("active-mode");
@@ -779,9 +973,21 @@ document.getElementById("bNext").onclick = next;
 document.getElementById("bPrev").onclick = prev;
 document.getElementById("bKnow").onclick = markKnow;
 document.getElementById("bDontKnow").onclick = markDontKnow;
-document.getElementById("bShuffle").onclick = ()=>{ shuffle(deck); idx=0; flipped=false; known=new Set(); wrong=new Set(); render(); };
+document.getElementById("bShuffle").onclick = ()=>{
+  if(grammarMode){ gIdx=0;gScore=0;gAnswered=false;renderGrammar(); return; }
+  applyWriteMode(); shuffle(deck); idx=0; flipped=false; known=new Set(); wrong=new Set(); render();
+};
 document.getElementById("bReset").onclick = ()=>{ showingWrongOnly=false; document.getElementById("bOnlyWrong").classList.remove("active-mode"); buildDeck(); };
 document.getElementById("bOnlyWrong").onclick = reviewWrong;
+const WRITE_STEPS=[0,0.3,0.6,1];
+document.getElementById("bWrite").onclick = ()=>{
+  const i = WRITE_STEPS.indexOf(writeRatio);
+  writeRatio = WRITE_STEPS[(i+1)%WRITE_STEPS.length];
+  const lbl = ["Écriture : off","Écriture : 30%","Écriture : 60%","Écriture : tout"][WRITE_STEPS.indexOf(writeRatio)];
+  document.getElementById("writeLabel").textContent = lbl;
+  document.getElementById("bWrite").classList.toggle("active-mode", writeRatio>0);
+  if(!grammarMode){ applyWriteMode(); render(); }
+};
 
 // ============ PROGRESSION PANEL ============
 function renderProgress(){
@@ -796,12 +1002,22 @@ function renderProgress(){
     const m = cards.filter(c=>mastered.has(c.t)).length;
     const p = Math.round(m/cards.length*100);
     const short = ch.replace("Verbes essentiels","🔥 Verbes essentiels");
+    const w = cards.filter(c=>notKnown.has(c.t)).length;
     rows += `<div class="prow">
       <div class="prow-top"><span class="prow-name">${short}</span><span class="prow-pct">${p}% <small>(${m}/${cards.length})</small></span></div>
       <div class="prow-bar"><div class="prow-fill" style="width:${p}%"></div></div>
+      <div class="prow-foot">${w ? `<button class="prow-wrong" onclick="reviewWrongCat('${ch.replace(/'/g,"\\'")}')">🎯 ${w} ratée${w>1?'s':''} — réviser</button>` : `<span class="prow-clean">✓ aucune ratée</span>`}</div>
     </div>`;
   }
   document.getElementById("panelList").innerHTML = rows;
+}
+function reviewWrongCat(ch){
+  activeFilter = ch;
+  renderFilters();
+  const sel = document.getElementById("filterSelect"); if(sel) sel.value = ch;
+  grammarMode = false;
+  closeProgress();
+  reviewWrong();
 }
 function openProgress(){ renderProgress(); document.getElementById("overlay").classList.add("show"); }
 function closeProgress(){ document.getElementById("overlay").classList.remove("show"); }
