@@ -235,8 +235,22 @@ body{
 .writecard,.gcard{position:relative}
 .write-top{position:static;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .write-top .front-chap,.write-top .front-num{position:static!important;top:auto!important;left:auto!important;right:auto!important}
+
+/* résultat des cartes à écrire (reste affiché jusqu'au clic) */
+.wres{text-align:left;border-radius:13px;padding:13px 15px;line-height:1.5}
+.wres-ok{background:#E4F5EC;border:1.5px solid #2E7D5B}
+.wres-ko{background:#FDECEA;border:1.5px solid #f3c3bd}
+.wres-yours{margin-top:6px;font-size:.9rem;color:#C2453B;text-decoration:line-through}
+.wres-line{margin-top:6px;font-size:1rem;font-weight:600;color:#1A1D2B}
+.wres-ex{margin-top:9px;font-size:.98rem;font-weight:600;color:#1A1D2B}
+.wres-exf{margin-top:2px;font-size:.86rem;font-style:italic;color:#7b7367}
+.write-btn.next-mode{background:#2E7D5B}
+.write-input:disabled{opacity:1;-webkit-text-fill-color:#1A1D2B}
 </style>
 <meta name="theme-color" content="#4C4FEE">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Korean Flash">
@@ -785,20 +799,43 @@ function applyWriteMode(){
 }
 function norm(s){ return (s||"").replace(/\s+/g,"").replace(/[.,!?·]/g,"").trim(); }
 function baseTerm(t){ return norm(t).replace(/\(.*?\)/g,""); }
+let writeResolved = false;   // la carte a été corrigée, on attend le clic "Suivant"
 function checkWrite(){
+  if(writeResolved) return;
   const inp = document.getElementById("writeInput");
   if(!inp) return;
   const c = deck[idx];
   const ok = baseTerm(inp.value) === baseTerm(c.t);
-  const fb = document.getElementById("writeFb");
+  showWriteResult(ok, c, inp.value);
+}
+function showWriteResult(ok, c, typed){
+  writeResolved = true;
+  const inp = document.getElementById("writeInput");
+  const fb  = document.getElementById("writeFb");
+  const btn = document.getElementById("writeCheckBtn");
+  const skip= document.getElementById("writeSkipBtn");
+  if(inp){ inp.classList.add(ok?"good":"bad"); inp.disabled = true; }
+  if(skip) skip.style.display = "none";
+  let html = "";
   if(ok){
-    fb.innerHTML = `<span class="wok">✓ Correct !</span>`;
-    inp.classList.add("good");
-    setTimeout(()=>{ markKnow(); }, 700);
+    html = `<div class="wres wres-ok"><span class="wok">✓ Correct !</span>
+              <div class="wres-line"><b class="kr">${esc(c.t)}</b> — ${esc(c.d)}</div>
+              <div class="wres-ex kr">${esc(c.ex)}</div>
+              <div class="wres-exf">${esc(c.exf)}</div></div>`;
   } else {
-    fb.innerHTML = `<span class="wko">✗ La réponse était <b class="kr">${esc(c.t)}</b></span>`;
-    inp.classList.add("bad");
-    setTimeout(()=>{ markDontKnow(); }, 1600);
+    const yours = (typed||"").trim();
+    html = `<div class="wres wres-ko"><span class="wko">✗ Pas tout à fait</span>
+              ${yours ? `<div class="wres-yours">Ta réponse : <b class="kr">${esc(yours)}</b></div>` : ``}
+              <div class="wres-line">Bonne réponse : <b class="kr">${esc(c.t)}</b> — ${esc(c.d)}</div>
+              <div class="wres-ex kr">${esc(c.ex)}</div>
+              <div class="wres-exf">${esc(c.exf)}</div></div>`;
+  }
+  if(fb) fb.innerHTML = html;
+  if(btn){
+    btn.textContent = "Suivant →";
+    btn.classList.add("next-mode");
+    btn.onclick = ()=>{ writeResolved = false; ok ? markKnow() : markDontKnow(); };
+    btn.focus();
   }
 }
 
@@ -833,6 +870,7 @@ function render(){
   document.getElementById("controls").style.visibility="visible";
   const c = deck[idx];
   if(c.write){
+    writeResolved = false;
     area.innerHTML = `
       <div class="writecard">
         <div class="write-top"><span class="front-chap">${esc(c.ch)}</span><span class="front-num">${idx+1}/${total}</span></div>
@@ -840,12 +878,13 @@ function render(){
         <div class="write-fr">${esc(c.d)}</div>
         <input id="writeInput" class="write-input kr" type="text" autocomplete="off" autocapitalize="off"
                autocorrect="off" spellcheck="false" placeholder="한국어로 쓰세요..." />
-        <button class="write-btn" onclick="checkWrite()">Vérifier</button>
+        <button class="write-btn" id="writeCheckBtn" onclick="checkWrite()">Vérifier</button>
         <div class="write-fb" id="writeFb"></div>
-        <button class="write-skip" onclick="revealWrite()">Je ne sais pas</button>
+        <button class="write-skip" id="writeSkipBtn" onclick="revealWrite()">Je ne sais pas</button>
       </div>`;
     const wi = document.getElementById("writeInput");
     if(wi){ wi.focus(); wi.onkeydown = (e)=>{ if(e.key==="Enter"){ e.preventDefault(); checkWrite(); } }; }
+    document.onkeydown = (e)=>{ if(writeResolved && e.key==="Enter"){ e.preventDefault(); document.getElementById("writeCheckBtn")?.click(); } };
     return;
   }
   area.innerHTML = `
@@ -896,10 +935,10 @@ function markDontKnow(){
   next();
 }
 function revealWrite(){
+  if(writeResolved) return;
   const c = deck[idx];
-  const fb = document.getElementById("writeFb");
-  if(fb) fb.innerHTML = `<span class="wko">La réponse : <b class="kr">${esc(c.t)}</b></span>`;
-  setTimeout(()=>{ markDontKnow(); }, 1400);
+  const inp = document.getElementById("writeInput");
+  showWriteResult(false, c, inp ? inp.value : "");
 }
 
 // ============ QCM GRAMMAIRE ============
@@ -1038,6 +1077,23 @@ document.addEventListener("keydown", e=>{
   if(e.key==="ArrowDown"){e.preventDefault();markKnow();}
   if(e.key==="ArrowUp"){e.preventDefault();markDontKnow();}
 });
+
+// ============ AUTO-UPDATE ============
+const APP_VERSION = "2.1";
+(async function checkUpdate(){
+  try {
+    const r = await fetch(location.href + "?_v=" + Date.now(), {cache:"no-store"});
+    if(!r.ok) return;
+    const txt = await r.text();
+    const m = txt.match(/APP_VERSION\s*=\s*"([^"]+)"/);
+    if(m && m[1] !== APP_VERSION){
+      console.log("Nouvelle version détectée:", m[1], "→ rechargement…");
+      // vider le cache du service worker s'il existe
+      if("caches" in window){ const ks=await caches.keys(); for(const k of ks) await caches.delete(k); }
+      location.reload(true);
+    }
+  } catch(e){ /* offline, pas grave */ }
+})();
 
 // ============ INIT ============
 renderFilters();
